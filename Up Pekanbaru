@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard CBM – UP Pekanbaru 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --navy:    #0D1B2A;
+    --blue1:   #1A3A5C;
+    --blue2:   #1F6FBF;
+    --cyan:    #00C2E0;
+    --green:   #22C55E;
+    --amber:   #F59E0B;
+    --red:     #EF4444;
+    --slate:   #1E293B;
+    --panel:   #162032;
+    --border:  rgba(255,255,255,0.07);
+    --text1:   #F1F5F9;
+    --text2:   #94A3B8;
+    --text3:   #64748B;
+    --mono:    'JetBrains Mono', monospace;
+    --sans:    'Inter', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--navy);
+    color: var(--text1);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #0D1B2A 0%, #0a1628 50%, #0D1B2A 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-box {
+    background: var(--panel);
+    border: 1px solid rgba(0,194,224,.2);
+    border-radius: 16px;
+    padding: 40px 44px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 80px rgba(0,194,224,.06);
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 32px;
+  }
+  .login-logo-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue2), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+  }
+  .login-logo-text { line-height: 1.3; }
+  .login-logo-text h3 { font-size: 15px; font-weight: 700; }
+  .login-logo-text p  { font-size: 11px; color: var(--cyan); }
+  .login-box h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .login-box p.sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text3); margin-bottom: 7px; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    color: var(--text1); font-size: 14px; font-family: var(--sans);
+    outline: none; transition: border-color .2s, background .2s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--cyan);
+    background: rgba(0,194,224,.06);
+  }
+  .form-group select option { background: #162032; color: var(--text1); }
+  .btn-login {
+    width: 100%; padding: 13px;
+    background: linear-gradient(90deg, var(--blue2), var(--cyan));
+    border: none; border-radius: 8px;
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: opacity .2s, transform .1s;
+    letter-spacing: .3px;
+  }
+  .btn-login:hover { opacity: .9; transform: translateY(-1px); }
+  .login-error {
+    color: var(--red); font-size: 12px; margin-top: 12px;
+    text-align: center; display: none;
+  }
+  .login-users-hint {
+    margin-top: 20px; padding: 14px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px; color: var(--text3);
+  }
+  .login-users-hint strong { color: var(--text2); display: block; margin-bottom: 6px; }
+  .login-users-hint .usr { display: flex; justify-content: space-between; padding: 3px 0; }
+  .login-users-hint .usr .role { color: var(--cyan); font-size: 10px; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: linear-gradient(90deg, var(--blue1) 0%, #0f2744 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .topbar-logo {
+    width: 38px; height: 38px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue2), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 14px; font-weight: 700; color: var(--text1); line-height: 1.2; }
+  .topbar-sub   { font-size: 11px; color: var(--cyan); font-weight: 500; letter-spacing:.5px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-badge {
+    font-family: var(--mono); font-size: 11px; color: var(--cyan);
+    background: rgba(0,194,224,.12); border: 1px solid rgba(0,194,224,.25);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .user-info {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px; border-radius: 20px;
+    background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    cursor: pointer; transition: background .2s;
+  }
+  .user-info:hover { background: rgba(255,255,255,.08); }
+  .user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .user-name { font-size: 12px; font-weight: 600; color: var(--text1); }
+  .user-role { font-size: 10px; color: var(--text3); }
+  .btn-logout {
+    font-size: 11px; color: var(--red); background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.2); border-radius: 6px;
+    padding: 5px 10px; cursor: pointer; transition: all .2s;
+  }
+  .btn-logout:hover { background: rgba(239,68,68,.2); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex; gap: 4px;
+    padding: 12px 28px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--slate);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    font-family: var(--sans); font-size: 12px; font-weight: 600;
+    color: var(--text3); background: transparent; border: none;
+    padding: 8px 16px; cursor: pointer; border-radius: 6px 6px 0 0;
+    border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text1); background: rgba(255,255,255,.05); }
+  .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); background: rgba(0,194,224,.06); }
+
+  /* ── MAIN ── */
+  .main { padding: 24px 28px; max-width: 1600px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── GRID ── */
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+  .col-span-4 { grid-column: span 4; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--blue2), var(--cyan));
+    opacity: 0; transition: opacity .3s;
+  }
+  .card:hover::before { opacity: 1; }
+  .card-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text3); margin-bottom: 12px;
+  }
+
+  /* ── KPI CARD ── */
+  .kpi-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .kpi-card.clickable { cursor: pointer; }
+  .kpi-card.clickable:hover { border-color: var(--cyan); box-shadow: 0 8px 32px rgba(0,194,224,.18); }
+  .card.clickable { cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s; }
+  .card.clickable:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,194,224,.15); border-color: rgba(0,194,224,.35); }
+  .kpi-accent { position: absolute; right: -12px; top: -12px; width: 70px; height: 70px; border-radius: 50%; opacity: .08; }
+  .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); }
+  .kpi-value { font-family: var(--mono); font-size: 36px; font-weight: 600; line-height: 1; }
+  .kpi-sub   { font-size: 11px; color: var(--text2); }
+  .kpi-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; width: fit-content;
+  }
+  .badge-green { background: rgba(34,197,94,.15); color: var(--green); }
+  .badge-red   { background: rgba(239,68,68,.15);  color: var(--red); }
+  .badge-amber { background: rgba(245,158,11,.15); color: var(--amber); }
+  .badge-cyan  { background: rgba(0,194,224,.15);  color: var(--cyan); }
+  .click-hint  { font-size: 10px; color: var(--cyan); opacity: 0.6; margin-top: 2px; font-style: italic; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead tr { background: rgba(255,255,255,.04); }
+  thead th {
+    padding: 10px 12px; text-align: left;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .8px; color: var(--text3);
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,.03); transition: background .15s; }
+  tbody tr:hover { background: rgba(255,255,255,.04); }
+  tbody tr.clickable-row:hover { background: rgba(0,194,224,.08); }
+  tbody td { padding: 9px 12px; color: var(--text2); vertical-align: middle; }
+  tbody td:first-child { color: var(--text1); font-weight: 500; }
+
+  /* ── STATUS BADGES ── */
+  .status {
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; letter-spacing: .5px; white-space: nowrap;
+  }
+  .status-completed   { background: rgba(34,197,94,.15);  color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+  .status-uncompleted { background: rgba(239,68,68,.15);  color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+  .status-progress    { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+  .status-alarm       { background: rgba(239,68,68,.2);   color: #fca5a5; border: 1px solid rgba(239,68,68,.4); }
+
+  /* ── PROGRESS BAR ── */
+  .prog-row { margin-bottom: 12px; }
+  .prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .prog-label { font-size: 12px; color: var(--text2); }
+  .prog-val   { font-family: var(--mono); font-size: 11px; color: var(--text1); }
+  .prog-bar   { height: 6px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 99px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+
+  /* ── DONUT LEGEND ── */
+  .donut-wrap { display: flex; gap: 20px; align-items: center; }
+  .donut-chart { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .legend-item  { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-lbl   { color: var(--text2); flex: 1; }
+  .legend-num   { font-family: var(--mono); font-size: 12px; color: var(--text1); font-weight: 600; }
+
+  /* ── SITE HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, var(--blue1) 0%, #0a1628 100%);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site-header h2 { font-size: 18px; font-weight: 700; }
+  .site-header p  { font-size: 12px; color: var(--cyan); margin-top: 2px; }
+  .site-kpis { display: flex; gap: 32px; }
+  .site-kpi  { text-align: center; }
+  .site-kpi .val { font-family: var(--mono); font-size: 28px; font-weight: 700; }
+  .site-kpi .lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  canvas { max-height: 320px; }
+
+  /* ── EDIT / ADD BUTTONS ── */
+  .table-actions-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+  }
+  .table-actions-bar .card-title { margin-bottom: 0; }
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 7px;
+    background: linear-gradient(90deg, var(--blue2), var(--cyan));
+    border: none; color: #fff; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: opacity .2s, transform .1s;
+  }
+  .btn-add:hover { opacity: .85; transform: translateY(-1px); }
+  .btn-edit {
+    padding: 4px 10px; border-radius: 5px;
+    background: rgba(31,111,191,.2); border: 1px solid rgba(31,111,191,.4);
+    color: var(--cyan); font-size: 10px; font-weight: 600;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .btn-edit:hover { background: rgba(31,111,191,.4); }
+  .btn-delete {
+    padding: 4px 10px; border-radius: 5px;
+    background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+    color: var(--red); font-size: 10px; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-delete:hover { background: rgba(239,68,68,.25); }
+  .td-actions { display: flex; gap: 5px; align-items: center; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid rgba(0,194,224,.2);
+    border-radius: 14px; padding: 28px 32px;
+    width: 100%; max-width: 640px;
+    max-height: 90vh; overflow-y: auto;
+    transform: translateY(16px); transition: transform .25s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .modal-header h3 { font-size: 16px; font-weight: 700; }
+  .modal-close { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+  .modal-close:hover { color: var(--text1); background: rgba(255,255,255,.07); }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .modal-grid .full { grid-column: span 2; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 18px; }
+  .btn-cancel {
+    padding: 9px 20px; border-radius: 7px;
+    background: rgba(255,255,255,.06); border: 1px solid var(--border);
+    color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-cancel:hover { background: rgba(255,255,255,.1); }
+  .btn-save {
+    padding: 9px 22px; border-radius: 7px;
+    background: linear-gradient(90deg, var(--blue2), var(--cyan));
+    border: none; color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: opacity .2s;
+  }
+  .btn-save:hover { opacity: .88; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 20000;
+    background: var(--slate); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 18px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 500;
+    transform: translateY(40px); opacity: 0;
+    transition: all .3s; pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: rgba(34,197,94,.3); }
+  #toast.error   { border-color: rgba(239,68,68,.3); }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── ROLE BADGE ── */
+  .role-admin { background: rgba(168,85,247,.15); color: #c084fc; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px; }
+  .role-viewer { background: rgba(100,116,139,.15); color: var(--text2); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px; }
+  .role-editor { background: rgba(0,194,224,.12); color: var(--cyan); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px; }
+
+  /* ── READONLY overlay ── */
+  .readonly-notice {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 7px;
+    background: rgba(100,116,139,.1); border: 1px solid rgba(100,116,139,.2);
+    font-size: 11px; color: var(--text3);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr 1fr; }
+    .col-span-2, .col-span-3, .col-span-4 { grid-column: span 2; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .modal-grid .full { grid-column: span 1; }
+  }
+  @media (max-width: 600px) {
+    .main { padding: 12px 14px; }
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .col-span-2, .col-span-3, .col-span-4 { grid-column: span 1; }
+    .donut-wrap { flex-direction: column; }
+    .site-kpis { gap: 18px; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .topbar-right { width: 100%; justify-content: flex-end; }
+    .modal { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ -->
+<!-- LOGIN SCREEN -->
+<!-- ══════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">CBM</div>
+      <div class="login-logo-text">
+        <h3>PT PLN Nusantara Power</h3>
+        <p>UP Pekanbaru · Dashboard 2026</p>
+      </div>
+    </div>
+    <h2>Selamat Datang</h2>
+    <p class="sub">Masuk untuk mengakses Dashboard CBM</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Masukkan password" autocomplete="current-password">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk →</button>
+    <div class="login-error" id="loginError">Username atau password salah. Coba lagi.</div>
+    <div class="login-users-hint">
+      <strong>👥 Akun Demo Tersedia:</strong>
+      <div class="usr"><span>admin</span><span>/ admin123</span><span class="role">Admin</span></div>
+      <div class="usr"><span>cbm.duri</span><span>/ duri2026</span><span class="role">Editor – Duri</span></div>
+      <div class="usr"><span>cbm.ktpj</span><span>/ ktpj2026</span><span class="role">Editor – KTPJ</span></div>
+      <div class="usr"><span>viewer</span><span>/ view2026</span><span class="role">Viewer</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- TOPBAR -->
+<!-- ══════════════════════════════════════ -->
+<div class="topbar" id="mainApp" style="display:none">
+  <div class="topbar-left">
+    <div class="topbar-logo">CBM</div>
+    <div>
+      <div class="topbar-title">PT PLN Nusantara Power UP Pekanbaru</div>
+      <div class="topbar-sub">CONDITION BASED MAINTENANCE · DASHBOARD 2026</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-badge">📅 SEMESTER 1 · 2026</div>
+    <div class="user-info" id="userInfoBadge">
+      <div class="user-avatar" id="userAvatar"></div>
+      <div>
+        <div class="user-name" id="userNameDisplay"></div>
+        <div class="user-role" id="userRoleDisplay"></div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Keluar</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="nav-tabs" id="navTabs" style="display:none">
+  <button class="tab-btn active" onclick="showTab('overview',this)">📊 Overview</button>
+  <button class="tab-btn" onclick="showTab('duri',this)">⚙️ ULPLTMG Duri</button>
+  <button class="tab-btn" onclick="showTab('ktpj',this)">💧 ULPLTA KTPJ</button>
+  <button class="tab-btn" onclick="showTab('tl',this)">⚡ ULPLTG Teluk Lembu</button>
+  <button class="tab-btn" onclick="showTab('pdm',this)">🔬 Resume PDM</button>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- MAIN CONTENT -->
+<!-- ══════════════════════════════════════ -->
+<div class="main" id="mainContent" style="display:none">
+
+<!-- ══════ TAB 1: OVERVIEW ══════ -->
+<div id="tab-overview" class="tab-panel active">
+  <div class="grid-4" id="overviewKPIs"></div>
+  <div class="grid-2">
+    <div class="card clickable" onclick="navigateToTab('duri')">
+      <div class="card-title">Distribusi Rekomendasi per Unit</div>
+      <div class="click-hint" style="margin-bottom:8px">→ Klik untuk detail ULPLTMG Duri</div>
+      <div class="donut-wrap">
+        <div class="donut-chart"><canvas id="donutSite" width="160" height="160"></canvas></div>
+        <div class="donut-legend" id="donutSiteLegend"></div>
+      </div>
+    </div>
+    <div class="card clickable" onclick="navigateToTab('ktpj')">
+      <div class="card-title">Status Penyelesaian Rekomendasi</div>
+      <div class="click-hint" style="margin-bottom:8px">→ Klik untuk detail status KTPJ</div>
+      <div class="donut-wrap">
+        <div class="donut-chart"><canvas id="donutStatus" width="160" height="160"></canvas></div>
+        <div class="donut-legend" id="donutStatusLegend"></div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card clickable" onclick="navigateToTab('pdm')">
+      <div class="card-title">Rekomendasi per Teknologi CBM</div>
+      <div class="click-hint" style="margin-bottom:6px">→ Klik untuk Resume PDM lengkap</div>
+      <canvas id="barTech"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Progress per Unit</div>
+      <br>
+      <div id="overviewProgress"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Ringkasan Monitoring Rekomendasi CBM Kumulatif 2026</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Unit</th><th>Total Rekomendasi</th><th>Jumlah WO</th>
+            <th>Uncomplete</th><th>Complete</th><th>% WO/Rekom</th>
+            <th>% Uncomplete</th><th>% Complete</th><th>Kesesuaian</th>
+          </tr>
+        </thead>
+        <tbody id="overviewTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TAB 2: DURI ══════ -->
+<div id="tab-duri" class="tab-panel">
+  <div class="site-header">
+    <div>
+      <h2>ULPLTMG Duri</h2>
+      <p>PLBP – PLTMG Duri · Semester 1 2026</p>
+    </div>
+    <div class="site-kpis" id="duriKPIs"></div>
+  </div>
+  <div class="grid-2">
+    <div class="card clickable" onclick="navigateToTab('pdm')">
+      <div class="card-title">Distribusi Teknologi CBM</div>
+      <div class="click-hint" style="margin-bottom:6px">→ Lihat Resume PDM</div>
+      <canvas id="donutDuriTech" height="160"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Rekomendasi per Equipment</div>
+      <canvas id="barDuriEquip" height="160"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-actions-bar">
+      <div class="card-title">Detail Rekomendasi – ULPLTMG Duri</div>
+      <div id="duriActionsBar"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Engine / Asset</th><th>Equipment</th><th>Teknologi</th>
+            <th>Failure Mode</th><th>No. SR</th><th>No. WO</th>
+            <th>Status</th><th>Keterangan</th><th id="duriActionsHeader"></th>
+          </tr>
+        </thead>
+        <tbody id="duriTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TAB 3: KTPJ ══════ -->
+<div id="tab-ktpj" class="tab-panel">
+  <div class="site-header">
+    <div>
+      <h2>ULPLTA Koto Panjang (KTPJ)</h2>
+      <p>PLTA Koto Panjang · Semester 1 2026</p>
+    </div>
+    <div class="site-kpis" id="ktpjKPIs"></div>
+  </div>
+  <div class="grid-3">
+    <div class="card clickable" onclick="navigateToTab('pdm')">
+      <div class="card-title">Distribusi Teknologi CBM</div>
+      <div class="click-hint" style="margin-bottom:6px">→ Lihat Resume PDM</div>
+      <canvas id="donutKTPJTech" height="160"></canvas>
+    </div>
+    <div class="card clickable" onclick="navigateToTab('overview')">
+      <div class="card-title">Status Rekomendasi</div>
+      <div class="click-hint" style="margin-bottom:6px">→ Lihat overview keseluruhan</div>
+      <div class="donut-wrap">
+        <div class="donut-chart"><canvas id="donutKTPJ" width="160" height="160"></canvas></div>
+        <div class="donut-legend" id="donutKTPJLegend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Rekomendasi per Turbin / Unit</div>
+      <canvas id="barKTPJUnit" height="160"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-actions-bar">
+      <div class="card-title">Detail Rekomendasi – ULPLTA KTPJ</div>
+      <div id="ktpjActionsBar"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Unit</th><th>Equipment</th><th>Teknologi</th>
+            <th>Failure Mode</th><th>No. SR</th><th>No. WO</th>
+            <th>Status</th><th>Kesesuaian</th><th id="ktpjActionsHeader"></th>
+          </tr>
+        </thead>
+        <tbody id="ktpjTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TAB 4: TELUK LEMBU ══════ -->
+<div id="tab-tl" class="tab-panel">
+  <div class="site-header">
+    <div>
+      <h2>ULPLTG Teluk Lembu</h2>
+      <p>PLTG Teluk Lembu · Semester 1 2026</p>
+    </div>
+    <div class="site-kpis" id="tlKPIs"></div>
+  </div>
+  <div class="card">
+    <div class="table-actions-bar">
+      <div class="card-title">Detail Rekomendasi – ULPLTG Teluk Lembu</div>
+      <div id="tlActionsBar"></div>
+    </div>
+    <div id="tlContent"></div>
+  </div>
+</div>
+
+<!-- ══════ TAB 5: RESUME PDM ══════ -->
+<div id="tab-pdm" class="tab-panel">
+  <div class="grid-4">
+    <div class="kpi-card"><div class="kpi-label">Total Equipment Dimonitor</div><div class="kpi-value" style="color:var(--cyan)">211</div><div class="kpi-sub">Semua teknologi</div></div>
+    <div class="kpi-card"><div class="kpi-label">Normal / Hijau</div><div class="kpi-value" style="color:var(--green)">174</div><div class="kpi-sub">Kondisi baik</div><div class="kpi-badge badge-green">82.5%</div></div>
+    <div class="kpi-card clickable" onclick="navigateToTab('duri')"><div class="kpi-label">Alarm / Kuning</div><div class="kpi-value" style="color:var(--amber)">9</div><div class="kpi-sub">Perlu tindakan</div><div class="kpi-badge badge-amber">4.3%</div><div class="click-hint">→ Lihat rekomendasi Duri</div></div>
+    <div class="kpi-card"><div class="kpi-label">Standby / Not Ready</div><div class="kpi-value" style="color:var(--text2)">28</div><div class="kpi-sub">Tidak beroperasi</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Realisasi vs Rencana Pengujian – Semua Teknologi CBM</div>
+    <div style="position:relative;height:300px"><canvas id="barRealisasiVsRencana"></canvas></div>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Status Kondisi Equipment per Teknologi CBM</div>
+    <div style="position:relative;height:260px"><canvas id="barPDMTech"></canvas></div>
+  </div>
+  <div class="section-label">Detail per Teknologi</div>
+  <div class="grid-4" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title" style="color:var(--cyan)">⚙ Vibrasi Rotating</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--cyan);line-height:1">27</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">55</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:49.1%;background:linear-gradient(90deg,var(--blue2),var(--cyan))"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--cyan);font-weight:700">49.1% tercapai</span><span style="color:var(--text3)">Sisa: 28</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 25</span><span class="kpi-badge badge-amber">Kuning: 2</span><span class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">Standby: 28</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--amber)">🔧 Vibrasi Reciprocating</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--amber);line-height:1">10</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">12</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:83.3%;background:linear-gradient(90deg,var(--amber),#fbbf24)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--amber);font-weight:700">83.3% tercapai</span><span style="color:var(--text3)">Sisa: 2</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 10</span><span class="kpi-badge badge-amber">Kuning: 0</span><span class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">Standby: 2</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--green)">🧪 Tribology (Lube Oil)</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green);line-height:1">17</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">17</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--green),#4ade80)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--green);font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 10</span><span class="kpi-badge badge-amber">Kuning: 7</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#a78bfa">🌡 IR Thermography</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#a78bfa;line-height:1">87</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">87</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#a78bfa;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 87</span></div></div>
+    </div>
+  </div>
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title" style="color:#38bdf8">⚡ MCSA</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#38bdf8;line-height:1">41</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">41</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#0284c7,#38bdf8)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#38bdf8;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 41</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#fb923c">🔬 DGA (Dissolved Gas Analysis)</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#fb923c;line-height:1">7</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">7</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#fb923c;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 7</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#f472b6">⚡ Partial Discharge</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
+        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#f472b6;line-height:1">4</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
+        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">4</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
+      </div>
+      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#be185d,#f472b6)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#f472b6;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 4</span></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- EDIT/ADD MODAL -->
+<!-- ══════════════════════════════════════ -->
+<div class="modal-overlay" id="rekomModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Tambah Rekomendasi</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-grid">
+      <div class="form-group">
+        <label>Unit / Engine *</label>
+        <input type="text" id="fEngine" placeholder="Contoh: ENGINE 1">
+      </div>
+      <div class="form-group">
+        <label>Kode Asset</label>
+        <input type="text" id="fAsset" placeholder="Contoh: PLBP-MG-01-MRA10HA001">
+      </div>
+      <div class="form-group">
+        <label>Equipment *</label>
+        <input type="text" id="fEquipment" placeholder="Contoh: ENGINE BLOCK">
+      </div>
+      <div class="form-group">
+        <label>Teknologi *</label>
+        <select id="fTeknologi">
+          <option value="">-- Pilih Teknologi --</option>
+          <option value="VIBRASI">VIBRASI</option>
+          <option value="LUBE OIL">LUBE OIL</option>
+          <option value="THERMOGRAPHY">THERMOGRAPHY</option>
+          <option value="MCSA">MCSA</option>
+          <option value="DGA">DGA</option>
+          <option value="PARTIAL DISCHARGE">PARTIAL DISCHARGE</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Failure Mode / Temuan *</label>
+        <input type="text" id="fFailureMode" placeholder="Contoh: Kenaikan Fe dan NA">
+      </div>
+      <div class="form-group">
+        <label>No. SR</label>
+        <input type="text" id="fSR" placeholder="Contoh: 650443">
+      </div>
+      <div class="form-group">
+        <label>No. WO</label>
+        <input type="text" id="fWO" placeholder="Contoh: WO13780">
+      </div>
+      <div class="form-group">
+        <label>Status *</label>
+        <select id="fStatus">
+          <option value="UNCOMPLETED">UNCOMPLETED</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="ON PROGRESS">ON PROGRESS</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kesesuaian</label>
+        <select id="fKesesuaian">
+          <option value="–">– (Belum)</option>
+          <option value="Sesuai">✓ Sesuai</option>
+          <option value="Tidak Sesuai">✗ Tidak Sesuai</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Keterangan</label>
+        <input type="text" id="fKeterangan" placeholder="Catatan tambahan...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="btn-save" onclick="saveRekom()">Simpan Rekomendasi</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3 style="color:var(--red)">⚠ Hapus Rekomendasi</h3>
+      <button class="modal-close" onclick="closeConfirm()">✕</button>
+    </div>
+    <p style="color:var(--text2);font-size:14px;line-height:1.6">Apakah Anda yakin ingin menghapus rekomendasi ini? Tindakan ini tidak dapat dibatalkan.</p>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeConfirm()">Batal</button>
+      <button class="btn-save" style="background:var(--red)" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <div class="toast-dot" id="toastDot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// USERS & AUTH
+// ══════════════════════════════════════════════
+const USERS = [
+  { username: 'admin',    password: 'admin123', name: 'Administrator', role: 'admin',  unit: 'all',  color: '#a855f7' },
+  { username: 'cbm.duri', password: 'duri2026', name: 'CBM Duri',      role: 'editor', unit: 'duri', color: '#00C2E0' },
+  { username: 'cbm.ktpj', password: 'ktpj2026', name: 'CBM KTPJ',      role: 'editor', unit: 'ktpj', color: '#22C55E' },
+  { username: 'viewer',   password: 'view2026', name: 'Viewer',         role: 'viewer', unit: 'all',  color: '#64748B' }
+];
+
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const user = USERS.find(x => x.username === u && x.password === p);
+  if (!user) {
+    document.getElementById('loginError').style.display = 'block';
+    return;
+  }
+  currentUser = user;
+  sessionStorage.setItem('cbm_user', JSON.stringify(user));
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  document.getElementById('navTabs').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'block';
+  // User badge
+  document.getElementById('userNameDisplay').textContent = user.name;
+  document.getElementById('userRoleDisplay').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+  const av = document.getElementById('userAvatar');
+  av.textContent = user.name.charAt(0).toUpperCase();
+  av.style.background = user.color;
+  initApp();
+}
+
+document.getElementById('loginPass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogout() {
+  sessionStorage.removeItem('cbm_user');
+  currentUser = null;
+  destroyCharts();
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('navTabs').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+function canEdit(unit) {
+  if (!currentUser) return false;
+  if (currentUser.role === 'admin') return true;
+  if (currentUser.role === 'editor' && (currentUser.unit === unit || currentUser.unit === 'all')) return true;
+  return false;
+}
+
+// ══════════════════════════════════════════════
+// DATA STORE (localStorage)
+// ══════════════════════════════════════════════
+const STORE_KEY_DURI = 'cbm_rekom_duri';
+const STORE_KEY_KTPJ = 'cbm_rekom_ktpj';
+const STORE_KEY_TL   = 'cbm_rekom_tl';
+
+const DEFAULT_DURI = [
+  { id: 'd1', engine: 'COMMON', asset: 'PLBP-00-00-SGL10AP001', equipment: 'FIRE PUMP',     teknologi: 'VIBRASI',  failureMode: 'Vibrasi tinggi pada motor dan pompa', sr: '650443',    wo: 'WO13780', status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: 'ON PROGRESS' },
+  { id: 'd2', engine: 'ENGINE 1', asset: 'PLBP-MG-01-MRA10HA001', equipment: 'ENGINE BLOCK', teknologi: 'LUBE OIL', failureMode: 'Kenaikan NA, Fe, dan SI',            sr: 'MONITORING', wo: '–',      status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'd3', engine: 'ENGINE 6', asset: 'PLBP-MG-06-MRA10HA001', equipment: 'ENGINE BLOCK', teknologi: 'LUBE OIL', failureMode: 'Kenaikan NA',                         sr: 'MONITORING', wo: '–',      status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'd4', engine: 'ENGINE 7', asset: 'PLBP-MG-07-MRA10HA001', equipment: 'ENGINE BLOCK', teknologi: 'LUBE OIL', failureMode: 'Kenaikan Fe dan NA',                  sr: 'MONITORING', wo: '–',      status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' }
+];
+const DEFAULT_KTPJ = [
+  { id: 'k1', engine: 'TURBIN 1', asset: 'MEX10BB002',   equipment: 'Hydraulic Sistem',          teknologi: 'LUBE OIL', failureMode: 'Oil Cleanliness Warning', sr: '537319', wo: 'WO9900',  status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'k2', engine: 'TURBIN 2', asset: 'MEX10BB002',   equipment: 'Hydraulic Sistem',          teknologi: 'LUBE OIL', failureMode: 'Oil Cleanliness Warning', sr: '537321', wo: 'WO9901',  status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'k3', engine: 'TURBIN 3', asset: 'MEX10BB002',   equipment: 'Hydraulic Sistem',          teknologi: 'LUBE OIL', failureMode: 'Oil Cleanliness Warning', sr: '537324', wo: 'WO9899',  status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'k4', engine: 'TURBIN 3', asset: 'MKD20KC003',   equipment: 'OIL COOLER COMBINE BEARING',teknologi: 'VIBRASI',  failureMode: 'Oil Cleanliness Warning', sr: '705947', wo: 'WO15412', status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'k5', engine: 'TURBIN 2', asset: 'MKD10HD001',   equipment: 'UPPER BEARING',             teknologi: 'VIBRASI',  failureMode: 'Unbalance',              sr: '677083', wo: 'WO14617', status: 'UNCOMPLETED', kesesuaian: '–',      keterangan: '–' },
+  { id: 'k6', engine: 'TURBIN 2', asset: 'PAC10AP002',   equipment: 'COOLING WATER PUMP 2.2',    teknologi: 'VIBRASI',  failureMode: 'Rotating Looseness',     sr: '698372', wo: 'WO15370', status: 'COMPLETED',   kesesuaian: 'Sesuai', keterangan: '–' },
+  { id: 'k7', engine: 'TURBIN 1', asset: 'GAF10AP001',   equipment: 'RAW WATER PUMP 1.1',        teknologi: 'VIBRASI',  failureMode: 'Bearing Problem',        sr: '677052', wo: 'WO14616', status: 'COMPLETED',   kesesuaian: 'Sesuai', keterangan: '–' }
+];
+const DEFAULT_TL = [];
+
+function loadData(key, defaults) {
+  try {
+    const s = localStorage.getItem(key);
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(defaults));
+  } catch { return JSON.parse(JSON.stringify(defaults)); }
+}
+function saveData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+let rekomDuri = loadData(STORE_KEY_DURI, DEFAULT_DURI);
+let rekomKTPJ = loadData(STORE_KEY_KTPJ, DEFAULT_KTPJ);
+let rekomTL   = loadData(STORE_KEY_TL,   DEFAULT_TL);
+
+function genId(prefix) { return prefix + Date.now() + Math.floor(Math.random()*1000); }
+
+// ══════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════
+let chartInstances = {};
+Chart.defaults.color = '#94A3B8';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.07)';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+
+function destroyCharts() {
+  Object.values(chartInstances).forEach(c => { try { c.destroy(); } catch {} });
+  chartInstances = {};
+}
+
+function createDonut(id, labels, data, colors) {
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch {} }
+  chartInstances[id] = new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#162032', hoverOffset: 6 }] },
+    options: {
+      cutout: '68%', responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } } }
+    }
+  });
+}
+function createDonutLegend(id, labels, data, colors) {
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch {} }
+  chartInstances[id] = new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#162032', hoverOffset: 6 }] },
+    options: {
+      cutout: '68%', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'bottom', labels: { boxWidth: 10, padding: 10, color: '#94A3B8', font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } }
+      }
+    }
+  });
+}
+function createHBar(id, labels, data, color) {
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch {} }
+  chartInstances[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color || '#1F6FBF', borderRadius: 4, borderSkipped: false }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function statusBadge(s) {
+  if (s === 'COMPLETED')   return `<span class="status status-completed">COMPLETED</span>`;
+  if (s === 'UNCOMPLETED') return `<span class="status status-uncompleted">UNCOMPLETED</span>`;
+  if (s === 'ON PROGRESS') return `<span class="status status-progress">ON PROGRESS</span>`;
+  return `<span class="status">${s}</span>`;
+}
+function teknologiBadge(t) {
+  const cls = (t === 'LUBE OIL') ? 'status-alarm' : 'status-progress';
+  return `<span class="status ${cls}">${t}</span>`;
+}
+function kesesuaianBadge(k) {
+  if (k === 'Sesuai') return `<span class="kpi-badge badge-green">✓ Sesuai</span>`;
+  if (k === 'Tidak Sesuai') return `<span class="kpi-badge badge-red">✗ Tidak Sesuai</span>`;
+  return '–';
+}
+
+// ══════════════════════════════════════════════
+// COMPUTED STATS
+// ══════════════════════════════════════════════
+function stats(data) {
+  const total = data.length;
+  const completed = data.filter(r => r.status === 'COMPLETED').length;
+  const uncompleted = total - completed;
+  return { total, completed, uncompleted };
+}
+
+// ══════════════════════════════════════════════
+// RENDER OVERVIEW
+// ══════════════════════════════════════════════
+function renderOverview() {
+  const sd = stats(rekomDuri), sk = stats(rekomKTPJ), st = stats(rekomTL);
+  const totalAll = sd.total + sk.total + st.total;
+  const completedAll = sd.completed + sk.completed + st.completed;
+  const uncompletedAll = totalAll - completedAll;
+
+  document.getElementById('overviewKPIs').innerHTML = `
+    <div class="kpi-card clickable" onclick="navigateToTab('duri')">
+      <div class="kpi-accent" style="background:var(--cyan)"></div>
+      <div class="kpi-label">Total Rekomendasi</div>
+      <div class="kpi-value" style="color:var(--cyan)">${totalAll}</div>
+      <div class="kpi-sub">Duri + KTPJ + TL</div>
+      <div class="kpi-badge badge-cyan">Semester 1 2026</div>
+      <div class="click-hint">→ Lihat detail unit</div>
+    </div>
+    <div class="kpi-card clickable" onclick="navigateToTab('duri')">
+      <div class="kpi-accent" style="background:var(--amber)"></div>
+      <div class="kpi-label">Uncompleted</div>
+      <div class="kpi-value" style="color:var(--amber)">${uncompletedAll}</div>
+      <div class="kpi-sub">Masih dalam proses</div>
+      <div class="kpi-badge badge-amber">${totalAll ? ((uncompletedAll/totalAll)*100).toFixed(1) : 0}% dari total</div>
+      <div class="click-hint">→ Lihat rekomendasi Duri</div>
+    </div>
+    <div class="kpi-card clickable" onclick="navigateToTab('ktpj')">
+      <div class="kpi-accent" style="background:var(--green)"></div>
+      <div class="kpi-label">Completed</div>
+      <div class="kpi-value" style="color:var(--green)">${completedAll}</div>
+      <div class="kpi-sub">Selesai ditindaklanjuti</div>
+      <div class="kpi-badge badge-green">${totalAll ? ((completedAll/totalAll)*100).toFixed(1) : 0}% completion rate</div>
+      <div class="click-hint">→ Lihat detail KTPJ</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-accent" style="background:var(--red)"></div>
+      <div class="kpi-label">Jumlah Work Order</div>
+      <div class="kpi-value" style="color:var(--text1)">${totalAll}</div>
+      <div class="kpi-sub">WO terdaftar</div>
+      <div class="kpi-badge badge-cyan">100% WO coverage</div>
+    </div>
+  `;
+
+  // Donut site legend
+  document.getElementById('donutSiteLegend').innerHTML = `
+    <div class="legend-item" style="cursor:pointer" onclick="navigateToTab('duri')">
+      <div class="legend-dot" style="background:#1F6FBF"></div>
+      <span class="legend-lbl">ULPLTMG Duri</span><span class="legend-num">${sd.total}</span>
+    </div>
+    <div class="legend-item" style="cursor:pointer" onclick="navigateToTab('ktpj')">
+      <div class="legend-dot" style="background:#00C2E0"></div>
+      <span class="legend-lbl">ULPLTA KTPJ</span><span class="legend-num">${sk.total}</span>
+    </div>
+    <div class="legend-item" style="cursor:pointer" onclick="navigateToTab('tl')">
+      <div class="legend-dot" style="background:#475569"></div>
+      <span class="legend-lbl">ULPLTG Teluk Lembu</span><span class="legend-num">${st.total}</span>
+    </div>
+  `;
+
+  // Donut status legend
+  document.getElementById('donutStatusLegend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:#22C55E"></div><span class="legend-lbl">COMPLETED</span><span class="legend-num">${completedAll}</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div><span class="legend-lbl">UNCOMPLETED</span><span class="legend-num">${uncompletedAll}</span></div>
+  `;
+
+  createDonut('donutSite', ['ULPLTMG Duri','ULPLTA KTPJ','ULPLTG TL'], [sd.total||0.01, sk.total||0.01, st.total||0.01], ['#1F6FBF','#00C2E0','#475569']);
+  createDonut('donutStatus', ['UNCOMPLETED','COMPLETED'], [uncompletedAll||0.01, completedAll||0.01], ['#EF4444','#22C55E']);
+
+  // Bar by technology
+  const techCount = {};
+  [...rekomDuri, ...rekomKTPJ, ...rekomTL].forEach(r => { techCount[r.teknologi] = (techCount[r.teknologi]||0)+1; });
+  const techLabels = ['Lube Oil Analysis','Vibrasi Rotating','Vibrasi Reciprocating','Thermography','MCSA','DGA','Partial Discharge'];
+  const techMap = { 'LUBE OIL': 0, 'VIBRASI': 1, 'THERMOGRAPHY': 3, 'MCSA': 4, 'DGA': 5, 'PARTIAL DISCHARGE': 6 };
+  const techData = [0,0,0,0,0,0,0];
+  Object.entries(techCount).forEach(([k,v]) => { if (techMap[k] !== undefined) techData[techMap[k]] += v; });
+  if (chartInstances['barTech']) { try { chartInstances['barTech'].destroy(); } catch {} }
+  chartInstances['barTech'] = new Chart(document.getElementById('barTech'), {
+    type: 'bar',
+    data: { labels: techLabels, datasets: [{ label: 'Rekomendasi', data: techData, backgroundColor: ['#1F6FBF','#00C2E0','#22C55E','#F59E0B','#A855F7','#EF4444','#64748B'], borderRadius: 5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } } }
+  });
+
+  // Progress
+  document.getElementById('overviewProgress').innerHTML = `
+    <div class="prog-row" style="cursor:pointer" onclick="navigateToTab('duri')">
+      <div class="prog-header"><span class="prog-label" style="color:var(--cyan)">⚙ ULPLTMG Duri →</span><span class="prog-val">${sd.completed} / ${sd.total} completed</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${sd.total?(sd.completed/sd.total*100):0}%;background:var(--amber)"></div></div>
+    </div>
+    <div class="prog-row" style="cursor:pointer" onclick="navigateToTab('ktpj')">
+      <div class="prog-header"><span class="prog-label" style="color:var(--cyan)">💧 ULPLTA KTPJ →</span><span class="prog-val">${sk.completed} / ${sk.total} completed</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${sk.total?(sk.completed/sk.total*100):0}%;background:var(--cyan)"></div></div>
+    </div>
+    <div class="prog-row" style="cursor:pointer" onclick="navigateToTab('tl')">
+      <div class="prog-header"><span class="prog-label" style="color:var(--cyan)">⚡ ULPLTG Teluk Lembu →</span><span class="prog-val">${st.total ? st.completed+' / '+st.total+' completed' : '0 / 0 — Belum ada data'}</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${st.total?(st.completed/st.total*100):0}%;background:var(--text3)"></div></div>
+    </div>
+    <br><div class="section-label">Kesesuaian Rekomendasi KTPJ</div>
+    <div class="prog-row">
+      <div class="prog-header"><span class="prog-label">Sesuai</span><span class="prog-val">${rekomKTPJ.filter(r=>r.kesesuaian==='Sesuai').length} item</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${rekomKTPJ.length?((rekomKTPJ.filter(r=>r.kesesuaian==='Sesuai').length/rekomKTPJ.length)*100):0}%;background:var(--green)"></div></div>
+    </div>
+  `;
+
+  // Summary table
+  const rows = [
+    { name: 'ULPLTMG Duri', tab: 'duri', s: sd },
+    { name: 'ULPLTA KTPJ',  tab: 'ktpj', s: sk },
+    { name: 'ULPLTG Teluk Lembu', tab: 'tl', s: st }
+  ];
+  document.getElementById('overviewTable').innerHTML = rows.map(r => `
+    <tr style="cursor:pointer" onclick="navigateToTab('${r.tab}')" class="clickable-row">
+      <td>${r.name} <span style="color:var(--cyan);font-size:10px">↗</span></td>
+      <td><span style="font-family:var(--mono);color:var(--cyan)">${r.s.total}</span></td>
+      <td>${r.s.total}</td>
+      <td>${r.s.uncompleted > 0 ? `<span class="status status-uncompleted">${r.s.uncompleted}</span>` : '–'}</td>
+      <td>${r.s.completed > 0 ? `<span class="status status-completed">${r.s.completed}</span>` : '–'}</td>
+      <td>100%</td>
+      <td>${r.s.total ? ((r.s.uncompleted/r.s.total)*100).toFixed(1)+'%' : '–'}</td>
+      <td>${r.s.total ? ((r.s.completed/r.s.total)*100).toFixed(1)+'%' : '–'}</td>
+      <td>–</td>
+    </tr>
+  `).join('') + `
+    <tr style="background:rgba(0,194,224,.06);font-weight:600">
+      <td style="color:var(--cyan)">TOTAL</td>
+      <td><span style="font-family:var(--mono);color:var(--cyan)">${totalAll}</span></td>
+      <td>${totalAll}</td>
+      <td><span class="status status-uncompleted">${uncompletedAll}</span></td>
+      <td><span class="status status-completed">${completedAll}</span></td>
+      <td>100%</td>
+      <td>${totalAll ? ((uncompletedAll/totalAll)*100).toFixed(1)+'%' : '–'}</td>
+      <td>${totalAll ? ((completedAll/totalAll)*100).toFixed(1)+'%' : '–'}</td>
+      <td>–</td>
+    </tr>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// RENDER DURI
+// ══════════════════════════════════════════════
+function renderDuri() {
+  const s = stats(rekomDuri);
+  document.getElementById('duriKPIs').innerHTML = `
+    <div class="site-kpi" style="cursor:pointer" onclick="navigateToTab('overview')"><div class="val" style="color:var(--cyan)">${s.total}</div><div class="lbl">Rekomendasi ↗</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--amber)">${s.uncompleted}</div><div class="lbl">Uncompleted</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--green)">${s.completed}</div><div class="lbl">Completed</div></div>
+  `;
+
+  // Donut tech
+  const techD = {}; rekomDuri.forEach(r => { techD[r.teknologi] = (techD[r.teknologi]||0)+1; });
+  const tLabels = Object.keys(techD), tData = Object.values(techD);
+  const tColors = ['#1F6FBF','#00C2E0','#22C55E','#F59E0B','#A855F7','#EF4444'];
+  createDonutLegend('donutDuriTech', tLabels, tData, tColors);
+
+  // Bar equip
+  const eqD = {}; rekomDuri.forEach(r => { const k = r.engine; eqD[k] = (eqD[k]||0)+1; });
+  createHBar('barDuriEquip', Object.keys(eqD), Object.values(eqD), ['#00C2E0','#1F6FBF','#1F6FBF','#1F6FBF','#1F6FBF','#1F6FBF']);
+
+  // Actions bar
+  const canE = canEdit('duri');
+  document.getElementById('duriActionsBar').innerHTML = canE
+    ? `<button class="btn-add" onclick="openModal('duri')">+ Tambah Rekomendasi</button>`
+    : `<div class="readonly-notice">🔒 Anda hanya dapat melihat data ini</div>`;
+  document.getElementById('duriActionsHeader').textContent = canE ? 'Aksi' : '';
+
+  // Table
+  document.getElementById('duriTable').innerHTML = rekomDuri.map((r, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${r.engine}</b><br><span style="font-size:10px;color:var(--text3)">${r.asset}</span></td>
+      <td>${r.equipment}</td>
+      <td>${teknologiBadge(r.teknologi)}</td>
+      <td>${r.failureMode}</td>
+      <td style="font-family:var(--mono);font-size:11px">${r.sr}</td>
+      <td style="font-family:var(--mono);font-size:11px">${r.wo}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>${r.keterangan || '–'}</td>
+      <td>${canE ? `<div class="td-actions"><button class="btn-edit" onclick="openModal('duri','${r.id}')">✏ Edit</button><button class="btn-delete" onclick="deleteRekom('duri','${r.id}')">✕</button></div>` : ''}</td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER KTPJ
+// ══════════════════════════════════════════════
+function renderKTPJ() {
+  const s = stats(rekomKTPJ);
+  document.getElementById('ktpjKPIs').innerHTML = `
+    <div class="site-kpi" style="cursor:pointer" onclick="navigateToTab('overview')"><div class="val" style="color:var(--cyan)">${s.total}</div><div class="lbl">Rekomendasi ↗</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--amber)">${s.uncompleted}</div><div class="lbl">Uncompleted</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--green)">${s.completed}</div><div class="lbl">Completed</div></div>
+  `;
+
+  const techK = {}; rekomKTPJ.forEach(r => { techK[r.teknologi] = (techK[r.teknologi]||0)+1; });
+  createDonutLegend('donutKTPJTech', Object.keys(techK), Object.values(techK), ['#1F6FBF','#00C2E0','#22C55E','#F59E0B']);
+
+  document.getElementById('donutKTPJLegend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span class="legend-lbl">UNCOMPLETED</span><span class="legend-num">${s.uncompleted}</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-lbl">COMPLETED</span><span class="legend-num">${s.completed}</span></div>
+  `;
+  createDonut('donutKTPJ', ['UNCOMPLETED','COMPLETED'], [s.uncompleted||0.01, s.completed||0.01], ['#EF4444','#22C55E']);
+
+  const unitK = {}; rekomKTPJ.forEach(r => { unitK[r.engine] = (unitK[r.engine]||0)+1; });
+  createHBar('barKTPJUnit', Object.keys(unitK), Object.values(unitK), ['#00C2E0','#00C2E0','#1F6FBF']);
+
+  const canE = canEdit('ktpj');
+  document.getElementById('ktpjActionsBar').innerHTML = canE
+    ? `<button class="btn-add" onclick="openModal('ktpj')">+ Tambah Rekomendasi</button>`
+    : `<div class="readonly-notice">🔒 Anda hanya dapat melihat data ini</div>`;
+  document.getElementById('ktpjActionsHeader').textContent = canE ? 'Aksi' : '';
+
+  document.getElementById('ktpjTable').innerHTML = rekomKTPJ.map((r, i) => `
+    <tr style="${r.status==='COMPLETED'?'background:rgba(34,197,94,.05)':''}">
+      <td>${i+1}</td>
+      <td><b>${r.engine}</b><br><span style="font-size:10px;color:var(--text3)">${r.asset}</span></td>
+      <td>${r.equipment}</td>
+      <td>${teknologiBadge(r.teknologi)}</td>
+      <td>${r.failureMode}</td>
+      <td style="font-family:var(--mono);font-size:11px">${r.sr}</td>
+      <td style="font-family:var(--mono);font-size:11px">${r.wo}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>${kesesuaianBadge(r.kesesuaian)}</td>
+      <td>${canE ? `<div class="td-actions"><button class="btn-edit" onclick="openModal('ktpj','${r.id}')">✏ Edit</button><button class="btn-delete" onclick="deleteRekom('ktpj','${r.id}')">✕</button></div>` : ''}</td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER TELUK LEMBU
+// ══════════════════════════════════════════════
+function renderTL() {
+  const s = stats(rekomTL);
+  document.getElementById('tlKPIs').innerHTML = `
+    <div class="site-kpi"><div class="val" style="color:var(--text3)">${s.total}</div><div class="lbl">Rekomendasi</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--text3)">${s.uncompleted}</div><div class="lbl">Uncompleted</div></div>
+    <div class="site-kpi"><div class="val" style="color:var(--text3)">${s.completed}</div><div class="lbl">Completed</div></div>
+  `;
+
+  const canE = canEdit('tl') || canEdit('duri'); // admin can edit all
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  document.getElementById('tlActionsBar').innerHTML = isAdmin
+    ? `<button class="btn-add" onclick="openModal('tl')">+ Tambah Rekomendasi</button>`
+    : `<div class="readonly-notice">🔒 Hanya Admin yang dapat menambah data unit ini</div>`;
+
+  if (rekomTL.length === 0) {
+    document.getElementById('tlContent').innerHTML = `
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:16px;opacity:.4">📋</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px">Belum Ada Data Rekomendasi</div>
+        <div style="font-size:13px;color:var(--text3)">Unit ULPLTG Teluk Lembu belum memiliki rekomendasi CBM pada Semester 1 2026</div>
+        ${isAdmin ? '<br><button class="btn-add" onclick="openModal(\'tl\')" style="margin:0 auto">+ Tambah Rekomendasi Pertama</button>' : ''}
+      </div>
+    `;
+  } else {
+    document.getElementById('tlContent').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Unit</th><th>Equipment</th><th>Teknologi</th><th>Failure Mode</th><th>No. SR</th><th>No. WO</th><th>Status</th><th>Keterangan</th>${isAdmin?'<th>Aksi</th>':''}</tr></thead>
+          <tbody>${rekomTL.map((r,i) => `
+            <tr>
+              <td>${i+1}</td>
+              <td><b>${r.engine}</b><br><span style="font-size:10px;color:var(--text3)">${r.asset}</span></td>
+              <td>${r.equipment}</td>
+              <td>${teknologiBadge(r.teknologi)}</td>
+              <td>${r.failureMode}</td>
+              <td style="font-family:var(--mono);font-size:11px">${r.sr}</td>
+              <td style="font-family:var(--mono);font-size:11px">${r.wo}</td>
+              <td>${statusBadge(r.status)}</td>
+              <td>${r.keterangan||'–'}</td>
+              ${isAdmin ? `<td><div class="td-actions"><button class="btn-edit" onclick="openModal('tl','${r.id}')">✏ Edit</button><button class="btn-delete" onclick="deleteRekom('tl','${r.id}')">✕</button></div></td>` : ''}
+            </tr>
+          `).join('')}</tbody>
+        </table>
+      </div>
+    `;
+  }
+}
+
+// ══════════════════════════════════════════════
+// PDM CHARTS
+// ══════════════════════════════════════════════
+function renderPDM() {
+  if (chartInstances['barRealisasiVsRencana']) { try { chartInstances['barRealisasiVsRencana'].destroy(); } catch {} }
+  chartInstances['barRealisasiVsRencana'] = new Chart(document.getElementById('barRealisasiVsRencana'), {
+    type: 'bar',
+    data: {
+      labels: ['Vibrasi\nRotating','Vibrasi\nReciprocating','Tribology\n(Lube Oil)','IR\nThermography','MCSA','DGA','Partial\nDischarge'],
+      datasets: [
+        { label: 'Rencana', data: [55,12,17,87,41,7,4], backgroundColor: 'rgba(148,163,184,0.25)', borderColor: 'rgba(148,163,184,0.6)', borderWidth: 1, borderRadius: 4 },
+        { label: 'Realisasi', data: [27,10,17,87,41,7,4], backgroundColor: ['#00C2E0','#F59E0B','#22C55E','#A855F7','#38bdf8','#fb923c','#f472b6'], borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16, font: { size: 11 } } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 10 } } }
+    }
+  });
+  if (chartInstances['barPDMTech']) { try { chartInstances['barPDMTech'].destroy(); } catch {} }
+  chartInstances['barPDMTech'] = new Chart(document.getElementById('barPDMTech'), {
+    type: 'bar',
+    data: {
+      labels: ['Vibrasi Rotating','Vibrasi Reciprocating','Tribology','IR Thermography','MCSA','DGA','Partial Discharge'],
+      datasets: [
+        { label: 'Normal (Hijau)', data: [25,10,10,87,41,7,4], backgroundColor: '#22C55E', borderRadius: 4 },
+        { label: 'Alarm (Kuning)', data: [2,0,7,0,0,0,0],   backgroundColor: '#F59E0B', borderRadius: 4 },
+        { label: 'Standby/N-A',   data: [28,2,0,0,0,0,0],   backgroundColor: '#475569', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 12 } } },
+      scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// MODAL – CRUD
+// ══════════════════════════════════════════════
+let modalUnit = null, modalEditId = null, deleteUnit = null, deleteId = null;
+
+function openModal(unit, id = null) {
+  modalUnit = unit; modalEditId = id;
+  document.getElementById('modalTitle').textContent = id ? '✏ Edit Rekomendasi' : '+ Tambah Rekomendasi Baru';
+  const modal = document.getElementById('rekomModal');
+
+  if (id) {
+    const arr = unit === 'duri' ? rekomDuri : unit === 'ktpj' ? rekomKTPJ : rekomTL;
+    const r = arr.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('fEngine').value     = r.engine;
+    document.getElementById('fAsset').value      = r.asset;
+    document.getElementById('fEquipment').value  = r.equipment;
+    document.getElementById('fTeknologi').value  = r.teknologi;
+    document.getElementById('fFailureMode').value= r.failureMode;
+    document.getElementById('fSR').value         = r.sr;
+    document.getElementById('fWO').value         = r.wo;
+    document.getElementById('fStatus').value     = r.status;
+    document.getElementById('fKesesuaian').value = r.kesesuaian;
+    document.getElementById('fKeterangan').value = r.keterangan;
+  } else {
+    ['fEngine','fAsset','fEquipment','fFailureMode','fSR','fWO','fKeterangan'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fTeknologi').value  = '';
+    document.getElementById('fStatus').value     = 'UNCOMPLETED';
+    document.getElementById('fKesesuaian').value = '–';
+  }
+  modal.classList.add('open');
+}
+
+function closeModal() { document.getElementById('rekomModal').classList.remove('open'); }
+
+function saveRekom() {
+  const engine = document.getElementById('fEngine').value.trim();
+  const equipment = document.getElementById('fEquipment').value.trim();
+  const teknologi = document.getElementById('fTeknologi').value;
+  const failureMode = document.getElementById('fFailureMode').value.trim();
+  if (!engine || !equipment || !teknologi || !failureMode) {
+    showToast('Lengkapi field yang wajib diisi (*)','error'); return;
+  }
+
+  const data = {
+    engine, asset: document.getElementById('fAsset').value.trim(),
+    equipment, teknologi, failureMode,
+    sr: document.getElementById('fSR').value.trim() || '–',
+    wo: document.getElementById('fWO').value.trim() || '–',
+    status: document.getElementById('fStatus').value,
+    kesesuaian: document.getElementById('fKesesuaian').value,
+    keterangan: document.getElementById('fKeterangan').value.trim() || '–'
+  };
+
+  let arr, key;
+  if (modalUnit === 'duri') { arr = rekomDuri; key = STORE_KEY_DURI; }
+  else if (modalUnit === 'ktpj') { arr = rekomKTPJ; key = STORE_KEY_KTPJ; }
+  else { arr = rekomTL; key = STORE_KEY_TL; }
+
+  if (modalEditId) {
+    const idx = arr.findIndex(x => x.id === modalEditId);
+    if (idx >= 0) arr[idx] = { ...arr[idx], ...data };
+    showToast('Rekomendasi berhasil diperbarui','success');
+  } else {
+    data.id = genId(modalUnit.charAt(0));
+    arr.push(data);
+    showToast('Rekomendasi baru berhasil ditambahkan','success');
+  }
+
+  saveData(key, arr);
+  closeModal();
+  refreshAll();
+}
+
+function deleteRekom(unit, id) {
+  deleteUnit = unit; deleteId = id;
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('open'); }
+function confirmDelete() {
+  let arr, key;
+  if (deleteUnit === 'duri') { arr = rekomDuri; key = STORE_KEY_DURI; rekomDuri = arr.filter(x => x.id !== deleteId); saveData(key, rekomDuri); }
+  else if (deleteUnit === 'ktpj') { arr = rekomKTPJ; key = STORE_KEY_KTPJ; rekomKTPJ = arr.filter(x => x.id !== deleteId); saveData(key, rekomKTPJ); }
+  else { arr = rekomTL; key = STORE_KEY_TL; rekomTL = arr.filter(x => x.id !== deleteId); saveData(key, rekomTL); }
+  closeConfirm();
+  showToast('Rekomendasi berhasil dihapus','success');
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let toastTimeout;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  const dot = document.getElementById('toastDot');
+  document.getElementById('toastMsg').textContent = msg;
+  dot.style.background = type === 'success' ? '#22C55E' : '#EF4444';
+  t.className = `show ${type}`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { t.className = ''; }, 3200);
+}
+
+// ══════════════════════════════════════════════
+// TAB & REFRESH
+// ══════════════════════════════════════════════
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  else document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('active');
+  });
+  document.querySelector('.main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function navigateToTab(id) { showTab(id, null); }
+
+function refreshAll() {
+  renderOverview();
+  renderDuri();
+  renderKTPJ();
+  renderTL();
+}
+
+// close modal on overlay click
+document.getElementById('rekomModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function initApp() {
+  renderOverview();
+  renderDuri();
+  renderKTPJ();
+  renderTL();
+  renderPDM();
+}
+
+// Check for existing session
+(function() {
+  const stored = sessionStorage.getItem('cbm_user');
+  if (stored) {
+    try {
+      const u = JSON.parse(stored);
+      const found = USERS.find(x => x.username === u.username);
+      if (found) {
+        document.getElementById('loginUser').value = found.username;
+        document.getElementById('loginPass').value = found.password;
+        doLogin();
+      }
+    } catch {}
+  }
+})();
+</script>
+</body>
+</html>
