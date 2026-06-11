@@ -700,107 +700,52 @@
 
 <!-- ══════ TAB 5: RESUME PDM ══════ -->
 <div id="tab-pdm" class="tab-panel">
-  <div class="grid-4">
-    <div class="kpi-card"><div class="kpi-label">Total Equipment Dimonitor</div><div class="kpi-value" style="color:var(--cyan)">211</div><div class="kpi-sub">Semua teknologi</div></div>
-    <div class="kpi-card"><div class="kpi-label">Normal / Hijau</div><div class="kpi-value" style="color:var(--green)">174</div><div class="kpi-sub">Kondisi baik</div><div class="kpi-badge badge-green">82.5%</div></div>
-    <div class="kpi-card clickable" onclick="navigateToTab('duri')"><div class="kpi-label">Alarm / Kuning</div><div class="kpi-value" style="color:var(--amber)">9</div><div class="kpi-sub">Perlu tindakan</div><div class="kpi-badge badge-amber">4.3%</div><div class="click-hint">→ Lihat rekomendasi Duri</div></div>
-    <div class="kpi-card"><div class="kpi-label">Standby / Not Ready</div><div class="kpi-value" style="color:var(--text2)">28</div><div class="kpi-sub">Tidak beroperasi</div></div>
+  <!-- KPI Summary (dynamic) -->
+  <div class="grid-4" id="pdmKPIs"></div>
+
+  <!-- Charts -->
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">Realisasi vs Rencana Pengujian</div>
+      <div style="position:relative;height:260px"><canvas id="barRealisasiVsRencana"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Status Kondisi Equipment per Teknologi</div>
+      <div style="position:relative;height:260px"><canvas id="barPDMTech"></canvas></div>
+    </div>
   </div>
-  <div class="card" style="margin-bottom:20px">
+
+  <!-- Editable Table -->
+  <div class="card">
     <div class="table-actions-bar">
-      <div class="card-title">Realisasi vs Rencana Pengujian – Semua Teknologi CBM</div>
-      <button class="btn-csv" onclick="exportCSV('pdm_rencana')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export CSV
-      </button>
+      <div class="card-title">Detail Data per Teknologi CBM</div>
+      <div class="actions-group" id="pdmActionsBar"></div>
     </div>
-    <div style="position:relative;height:300px"><canvas id="barRealisasiVsRencana"></canvas></div>
-  </div>
-  <div class="card" style="margin-bottom:20px">
-    <div class="table-actions-bar">
-      <div class="card-title">Status Kondisi Equipment per Teknologi CBM</div>
-      <button class="btn-csv" onclick="exportCSV('pdm_kondisi')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export CSV
-      </button>
-    </div>
-    <div style="position:relative;height:260px"><canvas id="barPDMTech"></canvas></div>
-  </div>
-  <div class="section-label">Detail per Teknologi</div>
-  <div class="grid-4" style="margin-bottom:16px">
-    <div class="card">
-      <div class="card-title" style="color:var(--cyan)">⚙ Vibrasi Rotating</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--cyan);line-height:1">27</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">55</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:49.1%;background:linear-gradient(90deg,var(--blue2),var(--cyan))"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--cyan);font-weight:700">49.1% tercapai</span><span style="color:var(--text3)">Sisa: 28</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 25</span><span class="kpi-badge badge-amber">Kuning: 2</span><span class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">Standby: 28</span></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:var(--amber)">🔧 Vibrasi Reciprocating</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--amber);line-height:1">10</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">12</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:83.3%;background:linear-gradient(90deg,var(--amber),#fbbf24)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--amber);font-weight:700">83.3% tercapai</span><span style="color:var(--text3)">Sisa: 2</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 10</span><span class="kpi-badge badge-amber">Kuning: 0</span><span class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">Standby: 2</span></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:var(--green)">🧪 Tribology (Lube Oil)</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green);line-height:1">17</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">17</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--green),#4ade80)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--green);font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 10</span><span class="kpi-badge badge-amber">Kuning: 7</span></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:#a78bfa">🌡 IR Thermography</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#a78bfa;line-height:1">87</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">87</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#a78bfa;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 87</span></div></div>
+    <div class="table-wrap">
+      <table id="pdmTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Teknologi CBM</th>
+            <th>Rencana</th>
+            <th>Realisasi</th>
+            <th>% Tercapai</th>
+            <th>Sisa</th>
+            <th>Hijau</th>
+            <th>Kuning</th>
+            <th>Standby</th>
+            <th>Total Eq.</th>
+            <th id="pdmActionsHeader"></th>
+          </tr>
+        </thead>
+        <tbody id="pdmTableBody"></tbody>
+      </table>
     </div>
   </div>
-  <div class="grid-3" style="margin-bottom:20px">
-    <div class="card">
-      <div class="card-title" style="color:#38bdf8">⚡ MCSA</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#38bdf8;line-height:1">41</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">41</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#0284c7,#38bdf8)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#38bdf8;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 41</span></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:#fb923c">🔬 DGA (Dissolved Gas Analysis)</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#fb923c;line-height:1">7</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">7</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#fb923c;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 7</span></div></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:#f472b6">⚡ Partial Discharge</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px">
-        <div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#f472b6;line-height:1">4</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Realisasi</div></div>
-        <div style="text-align:right"><div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">4</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Rencana</div></div>
-      </div>
-      <div class="prog-bar" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,#be185d,#f472b6)"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px"><span style="color:#f472b6;font-weight:700">100% tercapai ✓</span><span style="color:var(--text3)">Sisa: 0</span></div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Kondisi Equipment</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="kpi-badge badge-green">Hijau: 4</span></div></div>
-    </div>
-  </div>
+
+  <!-- Detail Cards (dynamic) -->
+  <div class="section-label" style="margin-top:20px">Detail Kartu per Teknologi</div>
+  <div id="pdmCards"></div>
 </div>
 
 </div><!-- /main -->
@@ -890,6 +835,64 @@
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeConfirm()">Batal</button>
       <button class="btn-save" style="background:var(--red)" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDM EDIT MODAL -->
+<div class="modal-overlay" id="pdmModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h3 id="pdmModalTitle">✏ Update Data PDM</h3>
+      <button class="modal-close" onclick="closePDMModal()">✕</button>
+    </div>
+    <div style="background:rgba(0,194,224,.06);border:1px solid rgba(0,194,224,.15);border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:var(--text2)">
+      📌 Teknologi: <strong id="pdmModalTechName" style="color:var(--cyan)"></strong>
+    </div>
+    <div class="modal-grid">
+      <div class="form-group">
+        <label>Rencana Pengujian *</label>
+        <input type="number" id="pRencana" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Realisasi Pengujian *</label>
+        <input type="number" id="pRealisasi" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Kondisi Hijau (Normal)</label>
+        <input type="number" id="pHijau" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Kondisi Kuning (Alarm)</label>
+        <input type="number" id="pKuning" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Standby / Not Ready</label>
+        <input type="number" id="pStandby" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Total Equipment Dimonitor</label>
+        <input type="number" id="pTotal" min="0" placeholder="Auto (Hijau+Kuning+Standby)" style="background:rgba(0,194,224,.04)">
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">Kosongkan = dihitung otomatis</div>
+      </div>
+    </div>
+    <!-- Live preview -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:4px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px">Preview Kalkulasi</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div><div style="font-size:10px;color:var(--text3)">% Tercapai</div><div id="prevPct" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--cyan)">0%</div></div>
+        <div><div style="font-size:10px;color:var(--text3)">Sisa</div><div id="prevSisa" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber)">0</div></div>
+        <div><div style="font-size:10px;color:var(--text3)">Total Equipment</div><div id="prevTotal" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text1)">0</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+          <div id="prevBar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue2),var(--cyan));transition:width .3s;width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closePDMModal()">Batal</button>
+      <button class="btn-save" onclick="savePDMRow()">💾 Simpan Perubahan</button>
     </div>
   </div>
 </div>
@@ -1376,43 +1379,280 @@ function renderTL() {
 }
 
 // ══════════════════════════════════════════════
-// PDM CHARTS
+// PDM DATA STORE
+// ══════════════════════════════════════════════
+const STORE_KEY_PDM = 'cbm_pdm_data';
+
+const DEFAULT_PDM = [
+  { id:'pdm1', nama:'Vibrasi Rotating',      icon:'⚙',  color:'#00C2E0', rencana:55, realisasi:27, hijau:25, kuning:2,  standby:28 },
+  { id:'pdm2', nama:'Vibrasi Reciprocating', icon:'🔧', color:'#F59E0B', rencana:12, realisasi:10, hijau:10, kuning:0,  standby:2  },
+  { id:'pdm3', nama:'Tribology (Lube Oil)',  icon:'🧪', color:'#22C55E', rencana:17, realisasi:17, hijau:10, kuning:7,  standby:0  },
+  { id:'pdm4', nama:'IR Thermography',       icon:'🌡', color:'#a78bfa', rencana:87, realisasi:87, hijau:87, kuning:0,  standby:0  },
+  { id:'pdm5', nama:'MCSA',                  icon:'⚡', color:'#38bdf8', rencana:41, realisasi:41, hijau:41, kuning:0,  standby:0  },
+  { id:'pdm6', nama:'DGA',                   icon:'🔬', color:'#fb923c', rencana:7,  realisasi:7,  hijau:7,  kuning:0,  standby:0  },
+  { id:'pdm7', nama:'Partial Discharge',     icon:'⚡', color:'#f472b6', rencana:4,  realisasi:4,  hijau:4,  kuning:0,  standby:0  }
+];
+
+let pdmData = loadData(STORE_KEY_PDM, DEFAULT_PDM);
+
+function pdmTotal(r) { return (r.hijau||0) + (r.kuning||0) + (r.standby||0) || r.realisasi || 0; }
+function pdmPct(r)   { return r.rencana > 0 ? Math.min(100, (r.realisasi / r.rencana * 100)) : 0; }
+function pdmSisa(r)  { return Math.max(0, r.rencana - r.realisasi); }
+
+// ══════════════════════════════════════════════
+// PDM RENDER
 // ══════════════════════════════════════════════
 function renderPDM() {
+  // ── KPI totals ──
+  const totEq      = pdmData.reduce((s,r) => s + pdmTotal(r), 0);
+  const totHijau   = pdmData.reduce((s,r) => s + (r.hijau||0), 0);
+  const totKuning  = pdmData.reduce((s,r) => s + (r.kuning||0), 0);
+  const totStandby = pdmData.reduce((s,r) => s + (r.standby||0), 0);
+  const totRencana = pdmData.reduce((s,r) => s + r.rencana, 0);
+  const totReal    = pdmData.reduce((s,r) => s + r.realisasi, 0);
+
+  document.getElementById('pdmKPIs').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-accent" style="background:var(--cyan)"></div>
+      <div class="kpi-label">Total Equipment Dimonitor</div>
+      <div class="kpi-value" style="color:var(--cyan)">${totEq}</div>
+      <div class="kpi-sub">Semua teknologi CBM</div>
+      <div class="kpi-badge badge-cyan">${totRencana} rencana pengujian</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-accent" style="background:var(--green)"></div>
+      <div class="kpi-label">Normal / Hijau</div>
+      <div class="kpi-value" style="color:var(--green)">${totHijau}</div>
+      <div class="kpi-sub">Kondisi baik</div>
+      <div class="kpi-badge badge-green">${totEq?((totHijau/totEq)*100).toFixed(1):0}%</div>
+    </div>
+    <div class="kpi-card clickable" onclick="navigateToTab('duri')">
+      <div class="kpi-accent" style="background:var(--amber)"></div>
+      <div class="kpi-label">Alarm / Kuning</div>
+      <div class="kpi-value" style="color:var(--amber)">${totKuning}</div>
+      <div class="kpi-sub">Perlu tindakan</div>
+      <div class="kpi-badge badge-amber">${totEq?((totKuning/totEq)*100).toFixed(1):0}%</div>
+      <div class="click-hint">→ Lihat rekomendasi</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-accent" style="background:var(--text3)"></div>
+      <div class="kpi-label">Standby / Not Ready</div>
+      <div class="kpi-value" style="color:var(--text2)">${totStandby}</div>
+      <div class="kpi-sub">Tidak beroperasi</div>
+      <div class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">${totReal}/${totRencana} realisasi</div>
+    </div>
+  `;
+
+  // ── Charts ──
+  const labels = pdmData.map(r => r.nama.replace(' (Lube Oil)','').replace(' Reciprocating','').replace(' Rotating',''));
+  const colors = pdmData.map(r => r.color);
+
   if (chartInstances['barRealisasiVsRencana']) { try { chartInstances['barRealisasiVsRencana'].destroy(); } catch {} }
   chartInstances['barRealisasiVsRencana'] = new Chart(document.getElementById('barRealisasiVsRencana'), {
     type: 'bar',
     data: {
-      labels: ['Vibrasi\nRotating','Vibrasi\nReciprocating','Tribology\n(Lube Oil)','IR\nThermography','MCSA','DGA','Partial\nDischarge'],
+      labels,
       datasets: [
-        { label: 'Rencana', data: [55,12,17,87,41,7,4], backgroundColor: 'rgba(148,163,184,0.25)', borderColor: 'rgba(148,163,184,0.6)', borderWidth: 1, borderRadius: 4 },
-        { label: 'Realisasi', data: [27,10,17,87,41,7,4], backgroundColor: ['#00C2E0','#F59E0B','#22C55E','#A855F7','#38bdf8','#fb923c','#f472b6'], borderRadius: 4 }
+        { label: 'Rencana',   data: pdmData.map(r=>r.rencana),   backgroundColor:'rgba(148,163,184,0.2)', borderColor:'rgba(148,163,184,0.5)', borderWidth:1, borderRadius:4 },
+        { label: 'Realisasi', data: pdmData.map(r=>r.realisasi), backgroundColor: colors, borderRadius:4 }
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 16, font: { size: 11 } } } },
-      scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 10 } } }
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{ boxWidth:12, padding:14, font:{size:11} } } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:10},maxRotation:20} }, y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{stepSize:10} } }
     }
   });
+
   if (chartInstances['barPDMTech']) { try { chartInstances['barPDMTech'].destroy(); } catch {} }
   chartInstances['barPDMTech'] = new Chart(document.getElementById('barPDMTech'), {
-    type: 'bar',
-    data: {
-      labels: ['Vibrasi Rotating','Vibrasi Reciprocating','Tribology','IR Thermography','MCSA','DGA','Partial Discharge'],
-      datasets: [
-        { label: 'Normal (Hijau)', data: [25,10,10,87,41,7,4], backgroundColor: '#22C55E', borderRadius: 4 },
-        { label: 'Alarm (Kuning)', data: [2,0,7,0,0,0,0],   backgroundColor: '#F59E0B', borderRadius: 4 },
-        { label: 'Standby/N-A',   data: [28,2,0,0,0,0,0],   backgroundColor: '#475569', borderRadius: 4 }
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:'Normal (Hijau)', data:pdmData.map(r=>r.hijau||0),   backgroundColor:'#22C55E', borderRadius:4 },
+        { label:'Alarm (Kuning)', data:pdmData.map(r=>r.kuning||0),  backgroundColor:'#F59E0B', borderRadius:4 },
+        { label:'Standby/N-A',   data:pdmData.map(r=>r.standby||0), backgroundColor:'#475569', borderRadius:4 }
       ]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 12 } } },
-      scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{boxWidth:10, padding:12} } },
+      scales:{ x:{ grid:{display:false} }, y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{stepSize:5} } }
     }
   });
+
+  // ── Actions bar ──
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  document.getElementById('pdmActionsBar').innerHTML = `
+    ${isAdmin ? '' : '<div class="readonly-notice">🔒 Hanya Admin yang dapat mengubah data PDM</div>'}
+    <button class="btn-csv" onclick="exportCSV('pdm_rencana')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </button>
+  `;
+  document.getElementById('pdmActionsHeader').textContent = isAdmin ? 'Aksi' : '';
+
+  // ── Table ──
+  document.getElementById('pdmTableBody').innerHTML = pdmData.map((r,i) => {
+    const pct  = pdmPct(r);
+    const sisa = pdmSisa(r);
+    const tot  = pdmTotal(r);
+    const pctColor = pct >= 100 ? 'var(--green)' : pct >= 80 ? 'var(--amber)' : 'var(--red)';
+    return `
+      <tr>
+        <td>${i+1}</td>
+        <td><span style="font-size:14px">${r.icon}</span> <strong style="color:${r.color}">${r.nama}</strong></td>
+        <td style="font-family:var(--mono);font-size:13px;color:var(--text1)">${r.rencana}</td>
+        <td style="font-family:var(--mono);font-size:13px;color:${r.color};font-weight:700">${r.realisasi}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:60px;height:5px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${pctColor};border-radius:99px"></div>
+            </div>
+            <span style="font-family:var(--mono);font-size:11px;color:${pctColor};font-weight:700">${pct.toFixed(1)}%</span>
+          </div>
+        </td>
+        <td style="font-family:var(--mono);color:${sisa>0?'var(--amber)':'var(--text3)'};font-weight:${sisa>0?'700':'400'}">${sisa}</td>
+        <td><span class="kpi-badge badge-green">${r.hijau||0}</span></td>
+        <td><span class="kpi-badge ${r.kuning>0?'badge-amber':''}" style="${r.kuning===0?'color:var(--text3)':''}">${r.kuning||0}</span></td>
+        <td><span style="color:var(--text3);font-family:var(--mono);font-size:11px">${r.standby||0}</span></td>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--text1)">${tot}</td>
+        <td>${isAdmin ? `<button class="btn-edit" onclick="openPDMModal('${r.id}')">✏ Update</button>` : ''}</td>
+      </tr>
+    `;
+  }).join('') + `
+    <tr style="background:rgba(0,194,224,.05);font-weight:600;border-top:2px solid rgba(0,194,224,.2)">
+      <td colspan="2" style="color:var(--cyan)">TOTAL</td>
+      <td style="font-family:var(--mono);color:var(--text1)">${totRencana}</td>
+      <td style="font-family:var(--mono);color:var(--cyan);font-weight:700">${totReal}</td>
+      <td><span style="font-family:var(--mono);font-size:12px;color:${totRencana?((totReal/totRencana*100)>=100?'var(--green)':'var(--amber)'):'var(--text3)'};font-weight:700">${totRencana?((totReal/totRencana)*100).toFixed(1):0}%</span></td>
+      <td style="font-family:var(--mono);color:var(--amber);font-weight:700">${totRencana-totReal}</td>
+      <td><span class="kpi-badge badge-green">${totHijau}</span></td>
+      <td><span class="kpi-badge ${totKuning>0?'badge-amber':''}">${totKuning}</span></td>
+      <td style="font-family:var(--mono);color:var(--text3)">${totStandby}</td>
+      <td style="font-family:var(--mono);color:var(--text1)">${totEq}</td>
+      <td></td>
+    </tr>
+  `;
+
+  // ── Detail Cards ──
+  const cols = pdmData.length <= 4 ? 'grid-4' : pdmData.length <= 6 ? 'grid-3' : 'grid-4';
+  document.getElementById('pdmCards').innerHTML = `
+    <div class="${cols}" style="margin-bottom:16px">
+      ${pdmData.map(r => {
+        const pct  = pdmPct(r);
+        const sisa = pdmSisa(r);
+        const tot  = pdmTotal(r);
+        const pctColor = pct >= 100 ? 'var(--green)' : pct >= 80 ? 'var(--amber)' : 'var(--red)';
+        const pctTick  = pct >= 100 ? ' ✓' : '';
+        return `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div class="card-title" style="color:${r.color};margin-bottom:0">${r.icon} ${r.nama}</div>
+              ${isAdmin ? `<button class="btn-edit" style="font-size:9px;padding:3px 8px" onclick="openPDMModal('${r.id}')">✏</button>` : ''}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+              <div>
+                <div style="font-family:var(--mono);font-size:30px;font-weight:700;color:${r.color};line-height:1">${r.realisasi}</div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Realisasi</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text3);line-height:1">${r.rencana}</div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Rencana</div>
+              </div>
+            </div>
+            <div class="prog-bar" style="height:8px;margin-bottom:6px">
+              <div class="prog-fill" style="width:${pct}%;background:linear-gradient(90deg,${r.color}99,${r.color})"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:10px">
+              <span style="color:${pctColor};font-weight:700">${pct.toFixed(1)}% tercapai${pctTick}</span>
+              <span style="color:var(--text3)">Sisa: ${sisa}</span>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:8px">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Kondisi Equipment (${tot} unit)</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                ${r.hijau>0   ? `<span class="kpi-badge badge-green">Hijau: ${r.hijau}</span>` : ''}
+                ${r.kuning>0  ? `<span class="kpi-badge badge-amber">Kuning: ${r.kuning}</span>` : ''}
+                ${r.standby>0 ? `<span class="kpi-badge" style="background:rgba(100,116,139,.15);color:var(--text3)">Standby: ${r.standby}</span>` : ''}
+                ${(r.hijau||0)+(r.kuning||0)+(r.standby||0)===0 ? '<span style="color:var(--text3);font-size:10px">–</span>' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
+
+// ══════════════════════════════════════════════
+// PDM MODAL
+// ══════════════════════════════════════════════
+let pdmEditId = null;
+
+function openPDMModal(id) {
+  pdmEditId = id;
+  const r = pdmData.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('pdmModalTitle').textContent = `✏ Update Data – ${r.nama}`;
+  document.getElementById('pdmModalTechName').textContent = `${r.icon} ${r.nama}`;
+  document.getElementById('pRencana').value   = r.rencana;
+  document.getElementById('pRealisasi').value = r.realisasi;
+  document.getElementById('pHijau').value     = r.hijau   || 0;
+  document.getElementById('pKuning').value    = r.kuning  || 0;
+  document.getElementById('pStandby').value   = r.standby || 0;
+  document.getElementById('pTotal').value     = '';
+  updatePDMPreview();
+  document.getElementById('pdmModal').classList.add('open');
+}
+
+function closePDMModal() {
+  document.getElementById('pdmModal').classList.remove('open');
+  pdmEditId = null;
+}
+
+function updatePDMPreview() {
+  const rencana   = parseInt(document.getElementById('pRencana').value)   || 0;
+  const realisasi = parseInt(document.getElementById('pRealisasi').value) || 0;
+  const hijau     = parseInt(document.getElementById('pHijau').value)     || 0;
+  const kuning    = parseInt(document.getElementById('pKuning').value)    || 0;
+  const standby   = parseInt(document.getElementById('pStandby').value)   || 0;
+  const totalOvr  = parseInt(document.getElementById('pTotal').value)     || 0;
+  const tot  = totalOvr || (hijau + kuning + standby) || realisasi;
+  const pct  = rencana > 0 ? Math.min(100, realisasi / rencana * 100) : 0;
+  const sisa = Math.max(0, rencana - realisasi);
+  document.getElementById('prevPct').textContent   = pct.toFixed(1) + '%';
+  document.getElementById('prevSisa').textContent  = sisa;
+  document.getElementById('prevTotal').textContent = tot;
+  document.getElementById('prevBar').style.width   = pct + '%';
+  document.getElementById('prevPct').style.color   = pct>=100?'var(--green)':pct>=80?'var(--amber)':'var(--red)';
+}
+
+// live preview on input
+['pRencana','pRealisasi','pHijau','pKuning','pStandby','pTotal'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updatePDMPreview);
+});
+
+function savePDMRow() {
+  const rencana   = parseInt(document.getElementById('pRencana').value);
+  const realisasi = parseInt(document.getElementById('pRealisasi').value);
+  if (isNaN(rencana) || isNaN(realisasi) || rencana < 0 || realisasi < 0) {
+    showToast('Rencana dan Realisasi harus diisi dengan angka valid', 'error'); return;
+  }
+  const hijau   = parseInt(document.getElementById('pHijau').value)   || 0;
+  const kuning  = parseInt(document.getElementById('pKuning').value)  || 0;
+  const standby = parseInt(document.getElementById('pStandby').value) || 0;
+
+  const idx = pdmData.findIndex(x => x.id === pdmEditId);
+  if (idx < 0) return;
+  pdmData[idx] = { ...pdmData[idx], rencana, realisasi, hijau, kuning, standby };
+  saveData(STORE_KEY_PDM, pdmData);
+  closePDMModal();
+  renderPDM();
+  showToast(`✓ Data ${pdmData[idx].nama} berhasil diperbarui`, 'success');
+}
+
+document.getElementById('pdmModal').addEventListener('click', function(e) { if (e.target === this) closePDMModal(); });
 
 // ══════════════════════════════════════════════
 // MODAL – CRUD
@@ -1592,31 +1832,28 @@ function exportCSV(type) {
 
   } else if (type === 'pdm_rencana') {
     const header = ['Teknologi CBM', 'Rencana Pengujian', 'Realisasi Pengujian', '% Tercapai', 'Sisa'];
-    const rows = [
-      ['Vibrasi Rotating',       55, 27, '49.1%', 28],
-      ['Vibrasi Reciprocating',  12, 10, '83.3%',  2],
-      ['Tribology (Lube Oil)',    17, 17, '100%',   0],
-      ['IR Thermography',        87, 87, '100%',   0],
-      ['MCSA',                   41, 41, '100%',   0],
-      ['DGA',                     7,  7, '100%',   0],
-      ['Partial Discharge',       4,  4, '100%',   0],
-      ['TOTAL',                 223,193, ((193/223)*100).toFixed(1)+'%', 30]
-    ];
+    const rows = pdmData.map(r => [
+      r.nama, r.rencana, r.realisasi,
+      r.rencana > 0 ? (r.realisasi/r.rencana*100).toFixed(1)+'%' : '0%',
+      Math.max(0, r.rencana - r.realisasi)
+    ]);
+    const totR = pdmData.reduce((s,r)=>s+r.rencana,0);
+    const totRl= pdmData.reduce((s,r)=>s+r.realisasi,0);
+    rows.push(['TOTAL', totR, totRl, totR?(totRl/totR*100).toFixed(1)+'%':'0%', Math.max(0,totR-totRl)]);
     downloadCSV([meta1, meta2, ['Resume PDM – Realisasi vs Rencana'], meta3, blank, header, ...rows], `CBM_PDM_Rencana_${stamp}.csv`);
     showToast('✓ CSV PDM Rencana vs Realisasi berhasil diunduh', 'success');
 
   } else if (type === 'pdm_kondisi') {
     const header = ['Teknologi CBM', 'Total Equipment', 'Normal (Hijau)', 'Alarm (Kuning)', 'Standby / N-A', '% Normal'];
-    const rows = [
-      ['Vibrasi Rotating',      55, 25, 2, 28, ((25/55)*100).toFixed(1)+'%'],
-      ['Vibrasi Reciprocating', 12, 10, 0,  2, ((10/12)*100).toFixed(1)+'%'],
-      ['Tribology (Lube Oil)',  17, 10, 7,  0, ((10/17)*100).toFixed(1)+'%'],
-      ['IR Thermography',       87, 87, 0,  0, '100%'],
-      ['MCSA',                  41, 41, 0,  0, '100%'],
-      ['DGA',                    7,  7, 0,  0, '100%'],
-      ['Partial Discharge',      4,  4, 0,  0, '100%'],
-      ['TOTAL',                223,184, 9, 30, ((184/211)*100).toFixed(1)+'%']
-    ];
+    const rows = pdmData.map(r => {
+      const tot = pdmTotal(r);
+      return [r.nama, tot, r.hijau||0, r.kuning||0, r.standby||0, tot?(((r.hijau||0)/tot)*100).toFixed(1)+'%':'0%'];
+    });
+    const tH = pdmData.reduce((s,r)=>s+(r.hijau||0),0);
+    const tK = pdmData.reduce((s,r)=>s+(r.kuning||0),0);
+    const tS = pdmData.reduce((s,r)=>s+(r.standby||0),0);
+    const tT = pdmData.reduce((s,r)=>s+pdmTotal(r),0);
+    rows.push(['TOTAL', tT, tH, tK, tS, tT?((tH/tT)*100).toFixed(1)+'%':'0%']);
     downloadCSV([meta1, meta2, ['Resume PDM – Status Kondisi Equipment'], meta3, blank, header, ...rows], `CBM_PDM_Kondisi_${stamp}.csv`);
     showToast('✓ CSV PDM Kondisi Equipment berhasil diunduh', 'success');
   }
