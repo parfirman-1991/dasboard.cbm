@@ -389,6 +389,49 @@
     font-size: 11px; color: var(--text3);
   }
 
+  /* ── CSV EXPORT ── */
+  .btn-csv {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 7px;
+    background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3);
+    color: #4ade80; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn-csv:hover { background: rgba(34,197,94,.22); border-color: rgba(34,197,94,.5); transform: translateY(-1px); }
+  .btn-csv svg { flex-shrink: 0; }
+  .actions-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .export-section {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-radius: 8px;
+    background: rgba(34,197,94,.06); border: 1px solid rgba(34,197,94,.15);
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+  }
+  .export-section span { font-size: 11px; color: var(--text2); }
+  .export-section strong { color: var(--green); }
+  /* export dropdown */
+  .export-dropdown { position: relative; display: inline-flex; }
+  .export-menu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 500;
+    background: var(--slate); border: 1px solid var(--border);
+    border-radius: 10px; padding: 6px; min-width: 200px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    display: none; flex-direction: column; gap: 2px;
+  }
+  .export-menu.open { display: flex; }
+  .export-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background .15s; color: var(--text1);
+    border: none; background: transparent; text-align: left; width: 100%;
+  }
+  .export-menu-item:hover { background: rgba(255,255,255,.07); }
+  .export-menu-item .em-icon { font-size: 15px; width: 20px; text-align: center; }
+  .export-menu-item .em-label { flex: 1; }
+  .export-menu-item .em-sub { font-size: 10px; color: var(--text3); font-weight: 400; }
+  .export-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr 1fr; }
@@ -516,7 +559,13 @@
     </div>
   </div>
   <div class="card">
-    <div class="card-title">Ringkasan Monitoring Rekomendasi CBM Kumulatif 2026</div>
+    <div class="table-actions-bar">
+      <div class="card-title">Ringkasan Monitoring Rekomendasi CBM Kumulatif 2026</div>
+      <button class="btn-csv" onclick="exportCSV('overview')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
@@ -647,11 +696,23 @@
     <div class="kpi-card"><div class="kpi-label">Standby / Not Ready</div><div class="kpi-value" style="color:var(--text2)">28</div><div class="kpi-sub">Tidak beroperasi</div></div>
   </div>
   <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Realisasi vs Rencana Pengujian – Semua Teknologi CBM</div>
+    <div class="table-actions-bar">
+      <div class="card-title">Realisasi vs Rencana Pengujian – Semua Teknologi CBM</div>
+      <button class="btn-csv" onclick="exportCSV('pdm_rencana')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
     <div style="position:relative;height:300px"><canvas id="barRealisasiVsRencana"></canvas></div>
   </div>
   <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Status Kondisi Equipment per Teknologi CBM</div>
+    <div class="table-actions-bar">
+      <div class="card-title">Status Kondisi Equipment per Teknologi CBM</div>
+      <button class="btn-csv" onclick="exportCSV('pdm_kondisi')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
     <div style="position:relative;height:260px"><canvas id="barPDMTech"></canvas></div>
   </div>
   <div class="section-label">Detail per Teknologi</div>
@@ -1167,9 +1228,15 @@ function renderDuri() {
 
   // Actions bar
   const canE = canEdit('duri');
-  document.getElementById('duriActionsBar').innerHTML = canE
-    ? `<button class="btn-add" onclick="openModal('duri')">+ Tambah Rekomendasi</button>`
-    : `<div class="readonly-notice">🔒 Anda hanya dapat melihat data ini</div>`;
+  document.getElementById('duriActionsBar').innerHTML = `
+    <div class="actions-group">
+      ${canE ? `<button class="btn-add" onclick="openModal('duri')">+ Tambah Rekomendasi</button>` : `<div class="readonly-notice">🔒 Hanya dapat melihat data ini</div>`}
+      <button class="btn-csv" onclick="exportCSV('duri')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+  `;
   document.getElementById('duriActionsHeader').textContent = canE ? 'Aksi' : '';
 
   // Table
@@ -1213,9 +1280,15 @@ function renderKTPJ() {
   createHBar('barKTPJUnit', Object.keys(unitK), Object.values(unitK), ['#00C2E0','#00C2E0','#1F6FBF']);
 
   const canE = canEdit('ktpj');
-  document.getElementById('ktpjActionsBar').innerHTML = canE
-    ? `<button class="btn-add" onclick="openModal('ktpj')">+ Tambah Rekomendasi</button>`
-    : `<div class="readonly-notice">🔒 Anda hanya dapat melihat data ini</div>`;
+  document.getElementById('ktpjActionsBar').innerHTML = `
+    <div class="actions-group">
+      ${canE ? `<button class="btn-add" onclick="openModal('ktpj')">+ Tambah Rekomendasi</button>` : `<div class="readonly-notice">🔒 Hanya dapat melihat data ini</div>`}
+      <button class="btn-csv" onclick="exportCSV('ktpj')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+  `;
   document.getElementById('ktpjActionsHeader').textContent = canE ? 'Aksi' : '';
 
   document.getElementById('ktpjTable').innerHTML = rekomKTPJ.map((r, i) => `
@@ -1247,9 +1320,15 @@ function renderTL() {
 
   const canE = canEdit('tl') || canEdit('duri'); // admin can edit all
   const isAdmin = currentUser && currentUser.role === 'admin';
-  document.getElementById('tlActionsBar').innerHTML = isAdmin
-    ? `<button class="btn-add" onclick="openModal('tl')">+ Tambah Rekomendasi</button>`
-    : `<div class="readonly-notice">🔒 Hanya Admin yang dapat menambah data unit ini</div>`;
+  document.getElementById('tlActionsBar').innerHTML = `
+    <div class="actions-group">
+      ${isAdmin ? `<button class="btn-add" onclick="openModal('tl')">+ Tambah Rekomendasi</button>` : `<div class="readonly-notice">🔒 Hanya Admin yang dapat menambah data unit ini</div>`}
+      <button class="btn-csv" onclick="exportCSV('tl')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+  `;
 
   if (rekomTL.length === 0) {
     document.getElementById('tlContent').innerHTML = `
