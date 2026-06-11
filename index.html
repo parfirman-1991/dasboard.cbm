@@ -1561,4 +1561,47 @@ function initApp() {
 })();
 </script>
 </body>
+  <button class="btn btn-primary" onclick="exportTableToCSV('data_vibrasi_cbm.csv')">Download CSV</button>
+
+<script>
+function exportTableToCSV(filename) {
+    var csv = [];
+    // Mengambil semua baris yang ada di dalam tabel
+    var rows = document.querySelectorAll("table tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (var j = 0; j < cols.length; j++) {
+            // Mengambil teks dari setiap kolom, bersihkan spasi, dan hilangkan koma agar format CSV tidak rusak
+            var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/,/g, ";");
+            row.push('"' + data + '"');
+        }
+        
+        csv.push(row.join(","));        
+    }
+
+    // Download file CSV
+    downloadCSV(csv.join("\n"), filename);
+}
+
+function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // Membuat objek Blob dari data CSV
+    csvFile = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+
+    // Membuat link unduhan samaran
+    downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+
+    // Memasukkan link ke dokumen HTML lalu otomatis mengkliknya
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+</script>
 </html>
