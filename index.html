@@ -527,6 +527,17 @@
 
 <!-- ══════ TAB 1: OVERVIEW ══════ -->
 <div id="tab-overview" class="tab-panel active">
+  <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;flex-wrap:wrap">
+    <span style="font-size:11px;color:var(--text3)">Export data:</span>
+    <button class="btn-csv" onclick="exportCSV('overview')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Ringkasan CSV
+    </button>
+    <button class="btn-csv" style="background:rgba(31,111,191,.15);border-color:rgba(31,111,191,.4);color:var(--cyan)" onclick="exportCSV('all')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Gabungan Semua Unit
+    </button>
+  </div>
   <div class="grid-4" id="overviewKPIs"></div>
   <div class="grid-2">
     <div class="card clickable" onclick="navigateToTab('duri')">
@@ -1493,6 +1504,125 @@ function confirmDelete() {
 }
 
 // ══════════════════════════════════════════════
+// CSV EXPORT
+// ══════════════════════════════════════════════
+function csvEscape(v) {
+  const s = (v === null || v === undefined) ? '' : String(v).replace(/–/g, '-');
+  return (s.includes(',') || s.includes('"') || s.includes('\n')) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function downloadCSV(rows, filename) {
+  const bom = '\uFEFF'; // UTF-8 BOM agar Excel baca karakter Indonesia dengan benar
+  const content = bom + rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportCSV(type) {
+  const now    = new Date();
+  const tgl    = now.toISOString().slice(0,10).replace(/-/g,'');
+  const jam    = now.toTimeString().slice(0,5).replace(':','');
+  const stamp  = tgl + '_' + jam;
+  const meta1  = ['PT PLN Nusantara Power – UP Pekanbaru'];
+  const meta2  = ['Dashboard CBM Semester 1 2026'];
+  const meta3  = ['Diekspor oleh:', currentUser ? currentUser.name : '-', 'pada', now.toLocaleString('id-ID')];
+  const blank  = [''];
+
+  if (type === 'duri') {
+    const header = ['No','Unit / Engine','Kode Asset','Equipment','Teknologi','Failure Mode / Temuan','No. SR','No. WO','Status','Keterangan'];
+    const rows   = rekomDuri.map((r,i) => [i+1, r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.keterangan]);
+    const sd     = stats(rekomDuri);
+    const summary = [blank, ['--- RINGKASAN ---'], ['Total Rekomendasi', sd.total], ['Completed', sd.completed], ['Uncompleted', sd.uncompleted], ['% Completed', sd.total ? ((sd.completed/sd.total)*100).toFixed(1)+'%' : '0%']];
+    downloadCSV([meta1, meta2, ['Unit: ULPLTMG Duri'], meta3, blank, header, ...rows, ...summary], `CBM_Duri_${stamp}.csv`);
+    showToast(`✓ CSV Duri berhasil diunduh (${rekomDuri.length} baris)`, 'success');
+
+  } else if (type === 'ktpj') {
+    const header = ['No','Unit','Kode Asset','Equipment','Teknologi','Failure Mode / Temuan','No. SR','No. WO','Status','Kesesuaian','Keterangan'];
+    const rows   = rekomKTPJ.map((r,i) => [i+1, r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.kesesuaian, r.keterangan]);
+    const sk     = stats(rekomKTPJ);
+    const sesuai = rekomKTPJ.filter(r => r.kesesuaian === 'Sesuai').length;
+    const summary = [blank, ['--- RINGKASAN ---'], ['Total Rekomendasi', sk.total], ['Completed', sk.completed], ['Uncompleted', sk.uncompleted], ['% Completed', sk.total ? ((sk.completed/sk.total)*100).toFixed(1)+'%' : '0%'], ['Kesesuaian - Sesuai', sesuai], ['Kesesuaian - Tidak Sesuai', rekomKTPJ.filter(r => r.kesesuaian === 'Tidak Sesuai').length]];
+    downloadCSV([meta1, meta2, ['Unit: ULPLTA KTPJ'], meta3, blank, header, ...rows, ...summary], `CBM_KTPJ_${stamp}.csv`);
+    showToast(`✓ CSV KTPJ berhasil diunduh (${rekomKTPJ.length} baris)`, 'success');
+
+  } else if (type === 'tl') {
+    const header = ['No','Unit','Kode Asset','Equipment','Teknologi','Failure Mode / Temuan','No. SR','No. WO','Status','Keterangan'];
+    if (rekomTL.length === 0) {
+      const rows = [['(Belum ada data rekomendasi untuk unit ini)']];
+      downloadCSV([meta1, meta2, ['Unit: ULPLTG Teluk Lembu'], meta3, blank, header, ...rows], `CBM_TelukLembu_${stamp}.csv`);
+    } else {
+      const rows = rekomTL.map((r,i) => [i+1, r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.keterangan]);
+      const st   = stats(rekomTL);
+      const summary = [blank, ['--- RINGKASAN ---'], ['Total Rekomendasi', st.total], ['Completed', st.completed], ['Uncompleted', st.uncompleted]];
+      downloadCSV([meta1, meta2, ['Unit: ULPLTG Teluk Lembu'], meta3, blank, header, ...rows, ...summary], `CBM_TelukLembu_${stamp}.csv`);
+    }
+    showToast(`✓ CSV Teluk Lembu berhasil diunduh`, 'success');
+
+  } else if (type === 'overview') {
+    const sd = stats(rekomDuri), sk = stats(rekomKTPJ), st = stats(rekomTL);
+    const totalAll = sd.total+sk.total+st.total, completedAll = sd.completed+sk.completed+st.completed, uncompletedAll = totalAll-completedAll;
+    const header = ['Unit','Total Rekomendasi','Jumlah WO','Uncomplete','Complete','% WO/Rekom','% Uncomplete','% Complete','Kesesuaian'];
+    const rows = [
+      ['ULPLTMG Duri', sd.total, sd.total, sd.uncompleted, sd.completed, '100%', sd.total?((sd.uncompleted/sd.total)*100).toFixed(1)+'%':'0%', sd.total?((sd.completed/sd.total)*100).toFixed(1)+'%':'0%', '-'],
+      ['ULPLTA KTPJ',  sk.total, sk.total, sk.uncompleted, sk.completed, '100%', sk.total?((sk.uncompleted/sk.total)*100).toFixed(1)+'%':'0%', sk.total?((sk.completed/sk.total)*100).toFixed(1)+'%':'0%', rekomKTPJ.filter(r=>r.kesesuaian==='Sesuai').length+' Sesuai'],
+      ['ULPLTG Teluk Lembu', st.total, st.total, st.uncompleted, st.completed, '100%', st.total?((st.uncompleted/st.total)*100).toFixed(1)+'%':'0%', st.total?((st.completed/st.total)*100).toFixed(1)+'%':'0%', '-'],
+      ['TOTAL', totalAll, totalAll, uncompletedAll, completedAll, '100%', totalAll?((uncompletedAll/totalAll)*100).toFixed(1)+'%':'0%', totalAll?((completedAll/totalAll)*100).toFixed(1)+'%':'0%', '-']
+    ];
+    downloadCSV([meta1, meta2, ['Ringkasan Semua Unit'], meta3, blank, header, ...rows], `CBM_Overview_${stamp}.csv`);
+    showToast('✓ CSV Overview berhasil diunduh', 'success');
+
+  } else if (type === 'all') {
+    // Gabungan semua rekomendasi semua unit
+    const header = ['No','Unit Kerja','Engine / Asset','Kode Asset','Equipment','Teknologi','Failure Mode','No. SR','No. WO','Status','Kesesuaian','Keterangan'];
+    const rowsDuri = rekomDuri.map((r,i) => [i+1,'ULPLTMG Duri', r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.kesesuaian, r.keterangan]);
+    const rowsKTPJ = rekomKTPJ.map((r,i) => [rowsDuri.length+i+1,'ULPLTA KTPJ', r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.kesesuaian, r.keterangan]);
+    const rowsTL   = rekomTL.map((r,i)   => [rowsDuri.length+rowsKTPJ.length+i+1,'ULPLTG Teluk Lembu', r.engine, r.asset, r.equipment, r.teknologi, r.failureMode, r.sr, r.wo, r.status, r.kesesuaian, r.keterangan]);
+    const allRows  = [...rowsDuri, ...rowsKTPJ, ...rowsTL];
+    const totalAll = allRows.length, completedAll = [...rekomDuri,...rekomKTPJ,...rekomTL].filter(r=>r.status==='COMPLETED').length;
+    const summary  = [blank, ['--- RINGKASAN TOTAL ---'], ['Total Semua Rekomendasi', totalAll], ['Completed', completedAll], ['Uncompleted', totalAll-completedAll], ['% Completed', totalAll?((completedAll/totalAll)*100).toFixed(1)+'%':'0%']];
+    downloadCSV([meta1, meta2, ['Gabungan Semua Unit'], meta3, blank, header, ...allRows, ...summary], `CBM_Semua_Unit_${stamp}.csv`);
+    showToast(`✓ CSV Gabungan berhasil diunduh (${allRows.length} total baris)`, 'success');
+
+  } else if (type === 'pdm_rencana') {
+    const header = ['Teknologi CBM', 'Rencana Pengujian', 'Realisasi Pengujian', '% Tercapai', 'Sisa'];
+    const rows = [
+      ['Vibrasi Rotating',       55, 27, '49.1%', 28],
+      ['Vibrasi Reciprocating',  12, 10, '83.3%',  2],
+      ['Tribology (Lube Oil)',    17, 17, '100%',   0],
+      ['IR Thermography',        87, 87, '100%',   0],
+      ['MCSA',                   41, 41, '100%',   0],
+      ['DGA',                     7,  7, '100%',   0],
+      ['Partial Discharge',       4,  4, '100%',   0],
+      ['TOTAL',                 223,193, ((193/223)*100).toFixed(1)+'%', 30]
+    ];
+    downloadCSV([meta1, meta2, ['Resume PDM – Realisasi vs Rencana'], meta3, blank, header, ...rows], `CBM_PDM_Rencana_${stamp}.csv`);
+    showToast('✓ CSV PDM Rencana vs Realisasi berhasil diunduh', 'success');
+
+  } else if (type === 'pdm_kondisi') {
+    const header = ['Teknologi CBM', 'Total Equipment', 'Normal (Hijau)', 'Alarm (Kuning)', 'Standby / N-A', '% Normal'];
+    const rows = [
+      ['Vibrasi Rotating',      55, 25, 2, 28, ((25/55)*100).toFixed(1)+'%'],
+      ['Vibrasi Reciprocating', 12, 10, 0,  2, ((10/12)*100).toFixed(1)+'%'],
+      ['Tribology (Lube Oil)',  17, 10, 7,  0, ((10/17)*100).toFixed(1)+'%'],
+      ['IR Thermography',       87, 87, 0,  0, '100%'],
+      ['MCSA',                  41, 41, 0,  0, '100%'],
+      ['DGA',                    7,  7, 0,  0, '100%'],
+      ['Partial Discharge',      4,  4, 0,  0, '100%'],
+      ['TOTAL',                223,184, 9, 30, ((184/211)*100).toFixed(1)+'%']
+    ];
+    downloadCSV([meta1, meta2, ['Resume PDM – Status Kondisi Equipment'], meta3, blank, header, ...rows], `CBM_PDM_Kondisi_${stamp}.csv`);
+    showToast('✓ CSV PDM Kondisi Equipment berhasil diunduh', 'success');
+  }
+}
+
+// ══════════════════════════════════════════════
 // TOAST
 // ══════════════════════════════════════════════
 let toastTimeout;
@@ -1561,47 +1691,4 @@ function initApp() {
 })();
 </script>
 </body>
-  <button class="btn btn-primary" onclick="exportTableToCSV('data_vibrasi_cbm.csv')">Download CSV</button>
-
-<script>
-function exportTableToCSV(filename) {
-    var csv = [];
-    // Mengambil semua baris yang ada di dalam tabel
-    var rows = document.querySelectorAll("table tr");
-    
-    for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll("td, th");
-        
-        for (var j = 0; j < cols.length; j++) {
-            // Mengambil teks dari setiap kolom, bersihkan spasi, dan hilangkan koma agar format CSV tidak rusak
-            var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/,/g, ";");
-            row.push('"' + data + '"');
-        }
-        
-        csv.push(row.join(","));        
-    }
-
-    // Download file CSV
-    downloadCSV(csv.join("\n"), filename);
-}
-
-function downloadCSV(csv, filename) {
-    var csvFile;
-    var downloadLink;
-
-    // Membuat objek Blob dari data CSV
-    csvFile = new Blob([csv], {type: "text/csv;charset=utf-8;"});
-
-    // Membuat link unduhan samaran
-    downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-
-    // Memasukkan link ke dokumen HTML lalu otomatis mengkliknya
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
-</script>
 </html>
